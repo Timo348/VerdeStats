@@ -1,7 +1,0 @@
-[
-  {"ts": "2024-01-15T08:30:00Z", "ms_played": 180000, "master_metadata_track_name": "Song A", "master_metadata_album_artist_name": "Artist X", "master_metadata_album_name": "Album 1", "platform": "Android"},
-  {"ts": "2024-02-20T19:45:00Z", "ms_played": 240000, "master_metadata_track_name": "Song B", "master_metadata_album_artist_name": "Artist Y", "master_metadata_album_name": "Album 2", "platform": "Windows"},
-  {"ts": "2024-03-10T22:15:00Z", "ms_played": 200000, "master_metadata_track_name": "Song A", "master_metadata_album_artist_name": "Artist X", "master_metadata_album_name": "Album 1", "platform": "Android"},
-  {"ts": "2024-04-05T14:00:00Z", "ms_played": 300000, "master_metadata_track_name": "Song C", "master_metadata_album_artist_name": "Artist Z", "master_metadata_album_name": "Album 3", "platform": "iOS"},
-  {"ts": "2024-05-12T09:20:00Z", "ms_played": 120000, "master_metadata_track_name": "Song B", "master_metadata_album_artist_name": "Artist Y", "master_metadata_album_name": "Album 2", "platform": "Windows"}
-]
