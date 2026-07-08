@@ -1,0 +1,8 @@
+node_modules/
+.env
+.git
+.gitignore
+uploads/*
+!uploads/.gitkeep
+test-data/
+README.md

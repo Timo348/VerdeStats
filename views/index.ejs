@@ -1,0 +1,128 @@
+<%- include('partials/head', { title: 'VerdeStats | Upload' }) %>
+<%- include('partials/nav') %>
+
+<div class="max-w-3xl mx-auto">
+  <div class="text-center mb-10">
+    <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+      Your Spotify. <span class="text-verde-green">Visualized.</span>
+    </h1>
+    <p class="text-neutral-400 text-lg">
+      Upload your Extended Streaming History and explore your top songs, artists, and listening habits in a green-themed dashboard.
+    </p>
+  </div>
+
+  <div class="panel p-8 rounded-xl mb-8">
+    <h2 class="text-xl font-bold text-white mb-2">Upload Streaming History</h2>
+    <p class="text-neutral-400 text-sm mb-6">
+      Select all <code class="bg-black/50 px-1.5 py-0.5 rounded text-verde-green font-mono text-xs">endsong_*.json</code> files from your Spotify data export, or upload the entire ZIP archive.
+    </p>
+
+    <form id="upload-form" action="/api/upload" method="POST" enctype="multipart/form-data" class="space-y-5">
+      <div
+        id="drop-zone"
+        class="drop-zone rounded-xl p-10 text-center cursor-pointer"
+      >
+        <input type="file" name="files" id="file-input" multiple accept=".json,.zip" class="hidden" />
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-verde-green/10 flex items-center justify-center shadow-green-glow">
+          <svg class="w-8 h-8 text-verde-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+        </div>
+        <p class="text-white font-semibold mb-1">Drop files here or click to browse</p>
+        <p class="text-neutral-500 text-sm">JSON files or a single ZIP archive</p>
+      </div>
+
+      <div id="file-list" class="hidden space-y-2"></div>
+
+      <button type="submit" id="upload-btn" class="btn-primary w-full" disabled>
+        Analyze Upload
+      </button>
+    </form>
+
+    <div id="upload-status" class="mt-4 hidden"></div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+    <div class="panel p-5 rounded-xl text-center">
+      <div class="text-verde-green text-2xl font-extrabold mb-1">Top 10</div>
+      <div class="text-neutral-400">Songs & Artists</div>
+    </div>
+    <div class="panel p-5 rounded-xl text-center">
+      <div class="text-verde-green text-2xl font-extrabold mb-1">Time Range</div>
+      <div class="text-neutral-400">Custom date filter</div>
+    </div>
+    <div class="panel p-5 rounded-xl text-center">
+      <div class="text-verde-green text-2xl font-extrabold mb-1">Insights</div>
+      <div class="text-neutral-400">Hours, weekdays, platforms</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  const fileList = document.getElementById('file-list');
+  const uploadBtn = document.getElementById('upload-btn');
+  const uploadForm = document.getElementById('upload-form');
+  const uploadStatus = document.getElementById('upload-status');
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    fileInput.files = e.dataTransfer.files;
+    updateFileList();
+  });
+
+  fileInput.addEventListener('change', updateFileList);
+
+  function updateFileList() {
+    fileList.innerHTML = '';
+    if (fileInput.files.length === 0) {
+      fileList.classList.add('hidden');
+      uploadBtn.disabled = true;
+      return;
+    }
+    fileList.classList.remove('hidden');
+    for (const file of fileInput.files) {
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between bg-black/40 border border-panel-border rounded-lg px-4 py-2';
+      div.innerHTML = `<span class="truncate">${file.name}</span><span class="text-neutral-500 font-mono">${(file.size / 1024 / 1024).toFixed(2)} MB</span>`;
+      fileList.appendChild(div);
+    }
+    uploadBtn.disabled = false;
+  }
+
+  uploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Uploading…';
+    uploadStatus.classList.remove('hidden');
+    uploadStatus.innerHTML = '<div class="text-verde-green text-sm">Uploading files, please wait…</div>';
+
+    const formData = new FormData(uploadForm);
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        window.location.href = `/dashboard/${data.sessionId}`;
+      } else {
+        throw new Error(data.error || 'Upload failed');
+      }
+    } catch (err) {
+      uploadStatus.innerHTML = `<div class="text-red-400 text-sm">Error: ${err.message}</div>`;
+      uploadBtn.disabled = false;
+      uploadBtn.textContent = 'Analyze Upload';
+    }
+  });
+</script>
+
+<%- include('partials/footer') %>

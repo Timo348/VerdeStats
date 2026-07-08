@@ -1,0 +1,206 @@
+<%- include('partials/head', { title: 'Dashboard | VerdeStats' }) %>
+<%- include('partials/nav') %>
+
+<div class="mb-6">
+  <a href="/" class="text-sm text-verde-green hover:text-white transition-colors">← Back to upload</a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+  <div class="panel p-6 rounded-xl lg:col-span-1">
+    <h2 class="text-lg font-bold text-white mb-4">Analysis Settings</h2>
+    <form id="analyze-form" class="space-y-4">
+      <div>
+        <label class="form-label">Start Date</label>
+        <input type="date" id="start-date" name="startDate" class="input-field" required>
+      </div>
+      <div>
+        <label class="form-label">End Date</label>
+        <input type="date" id="end-date" name="endDate" class="input-field" required>
+      </div>
+      <div>
+        <label class="form-label">Minimum listen time (ms)</label>
+        <input type="number" id="min-ms" name="minMs" value="0" min="0" step="1000" class="input-field">
+        <p class="hint">Skip streams shorter than this. 30000 = 30 seconds.</p>
+      </div>
+      <button type="submit" id="analyze-btn" class="btn-primary w-full">Run Analysis</button>
+    </form>
+    <div id="status-msg" class="mt-4 hidden text-sm"></div>
+  </div>
+
+  <div class="panel p-6 rounded-xl lg:col-span-2 flex flex-col justify-center items-center text-center" id="empty-state">
+    <div class="w-20 h-20 mb-4 rounded-full bg-verde-green/10 flex items-center justify-center shadow-green-glow">
+      <svg class="w-10 h-10 text-verde-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+    </div>
+    <h3 class="text-xl font-bold text-white mb-2">Ready to analyze</h3>
+    <p class="text-neutral-400 max-w-md">Choose a date range and click "Run Analysis" to generate your personalized Spotify statistics.</p>
+  </div>
+</div>
+
+<div id="results" class="hidden space-y-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="stat-cards"></div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="panel p-6 rounded-xl">
+      <h2 class="text-lg font-bold text-white mb-4">Top 10 Songs</h2>
+      <div id="top-songs" class="space-y-3"></div>
+    </div>
+    <div class="panel p-6 rounded-xl">
+      <h2 class="text-lg font-bold text-white mb-4">Top 10 Artists</h2>
+      <div id="top-artists" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="panel p-6 rounded-xl">
+      <h2 class="text-lg font-bold text-white mb-4">Top Albums</h2>
+      <div id="top-albums" class="space-y-3"></div>
+    </div>
+    <div class="panel p-6 rounded-xl lg:col-span-2">
+      <h2 class="text-lg font-bold text-white mb-4">Listening by Month</h2>
+      <div id="monthly-chart" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <div class="panel p-6 rounded-xl">
+    <h2 class="text-lg font-bold text-white mb-4">Insights</h2>
+    <div id="insights" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm"></div>
+  </div>
+</div>
+
+<script>
+  const sessionId = '<%= sessionId %>';
+
+  // Default date range: last 365 days
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - 365);
+  document.getElementById('end-date').value = end.toISOString().split('T')[0];
+  document.getElementById('start-date').value = start.toISOString().split('T')[0];
+
+  function formatDuration(d) {
+    const parts = [];
+    if (d.hours > 0) parts.push(`${d.hours}h`);
+    if (d.minutes > 0) parts.push(`${d.minutes}m`);
+    if (d.seconds > 0 || parts.length === 0) parts.push(`${d.seconds}s`);
+    return parts.join(' ');
+  }
+
+  function renderBar(label, sub, ms, maxMs, index) {
+    const pct = maxMs ? Math.max((ms / maxMs) * 100, 1) : 0;
+    return `
+      <div class="flex items-center gap-3 text-sm">
+        <div class="w-6 text-center font-mono text-verde-green font-bold">${index}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between mb-1">
+            <span class="text-white font-medium truncate" title="${label}">${label}</span>
+            <span class="text-neutral-400 font-mono whitespace-nowrap ml-2">${sub}</span>
+          </div>
+          <div class="bar-bg h-2">
+            <div class="bar-fill" style="width: ${pct}%"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById('analyze-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('analyze-btn');
+    const status = document.getElementById('status-msg');
+    btn.disabled = true;
+    btn.textContent = 'Analyzing…';
+    status.classList.remove('hidden');
+    status.innerHTML = '<span class="text-verde-green">Crunching your data…</span>';
+
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          startDate: document.getElementById('start-date').value,
+          endDate: document.getElementById('end-date').value,
+          minMs: Number(document.getElementById('min-ms').value)
+        })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Analysis failed');
+      renderResult(data.result);
+      status.classList.add('hidden');
+    } catch (err) {
+      status.innerHTML = `<span class="text-red-400">${err.message}</span>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Run Analysis';
+    }
+  });
+
+  function renderResult(result) {
+    document.getElementById('empty-state').classList.add('hidden');
+    document.getElementById('results').classList.remove('hidden');
+
+    const t = result.totals;
+    document.getElementById('stat-cards').innerHTML = `
+      <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Total Time</div>
+        <div class="text-2xl font-extrabold text-white">${formatDuration(t.duration)}</div>
+      </div>
+      <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Streams</div>
+        <div class="text-2xl font-extrabold text-white">${t.streams.toLocaleString()}</div>
+      </div>
+      <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Avg / Stream</div>
+        <div class="text-2xl font-extrabold text-white">${t.avgDurationString}</div>
+      </div>
+      <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Files</div>
+        <div class="text-2xl font-extrabold text-white">${result.fileCount}</div>
+      </div>
+    `;
+
+    const maxSong = result.topSongs[0]?.ms || 1;
+    document.getElementById('top-songs').innerHTML = result.topSongs.length
+      ? result.topSongs.map((s, i) => renderBar(s.name, s.durationString, s.ms, maxSong, i + 1)).join('')
+      : '<div class="text-neutral-500 italic">No songs found in this range.</div>';
+
+    const maxArtist = result.topArtists[0]?.ms || 1;
+    document.getElementById('top-artists').innerHTML = result.topArtists.length
+      ? result.topArtists.map((a, i) => renderBar(a.name, a.durationString, a.ms, maxArtist, i + 1)).join('')
+      : '<div class="text-neutral-500 italic">No artists found in this range.</div>';
+
+    const maxAlbum = result.topAlbums[0]?.ms || 1;
+    document.getElementById('top-albums').innerHTML = result.topAlbums.length
+      ? result.topAlbums.map((a, i) => renderBar(a.name, a.durationString, a.ms, maxAlbum, i + 1)).join('')
+      : '<div class="text-neutral-500 italic">No albums found in this range.</div>';
+
+    const monthly = result.insights.monthlyListening;
+    const maxMonthly = monthly.length ? Math.max(...monthly.map(m => m.ms)) : 1;
+    document.getElementById('monthly-chart').innerHTML = monthly.length
+      ? monthly.map(m => renderBar(m.month, m.durationString, m.ms, maxMonthly, '')).join('')
+      : '<div class="text-neutral-500 italic">No monthly data.</div>';
+
+    document.getElementById('insights').innerHTML = `
+      <div class="panel p-4 rounded-xl">
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Peak Hour</div>
+        <div class="text-xl font-extrabold text-white">${String(result.insights.topHour).padStart(2, '0')}:00</div>
+      </div>
+      <div class="panel p-4 rounded-xl">
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Top Day</div>
+        <div class="text-xl font-extrabold text-white">${result.insights.topWeekday}</div>
+      </div>
+      <div class="panel p-4 rounded-xl">
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">First Stream</div>
+        <div class="text-xl font-extrabold text-white">${result.dateRange.firstStream ? new Date(result.dateRange.firstStream).toLocaleDateString() : '-'}</div>
+      </div>
+      <div class="panel p-4 rounded-xl">
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Top Platform</div>
+        <div class="text-xl font-extrabold text-white truncate" title="${result.insights.topPlatforms[0]?.name || '-'}">${result.insights.topPlatforms[0]?.name || '-'}</div>
+      </div>
+    `;
+
+    window.scrollTo({ top: document.getElementById('results').offsetTop - 100, behavior: 'smooth' });
+  }
+</script>
+
+<%- include('partials/footer') %>
