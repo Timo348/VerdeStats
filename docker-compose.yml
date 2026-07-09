@@ -1,12 +1,13 @@
 services:
   verdestats:
+    build: .
     image: timo348/verdestats:latest
     container_name: verdestats
     restart: unless-stopped
     env_file:
       - .env
     ports:
-      - "30006:3000"
+      - "30008:3000"
     volumes:
       - ./uploads:/app/uploads
     networks:

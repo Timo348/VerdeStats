@@ -14,7 +14,7 @@
   <div class="panel p-8 rounded-xl mb-8">
     <h2 class="text-xl font-bold text-white mb-2">Upload Streaming History</h2>
     <p class="text-neutral-400 text-sm mb-6">
-      Select all <code class="bg-black/50 px-1.5 py-0.5 rounded text-verde-green font-mono text-xs">endsong_*.json</code> files from your Spotify data export, or upload the entire ZIP archive.
+      Select all <code class="bg-black/50 px-1.5 py-0.5 rounded text-verde-green font-mono text-xs">Streaming_History_Audio_*.json</code> / <code class="bg-black/50 px-1.5 py-0.5 rounded text-verde-green font-mono text-xs">endsong_*.json</code> files from your Spotify data export, or upload the entire ZIP archive.
     </p>
 
     <form id="upload-form" action="/api/upload" method="POST" enctype="multipart/form-data" class="space-y-5">
@@ -108,9 +108,16 @@
     uploadStatus.classList.remove('hidden');
     uploadStatus.innerHTML = '<div class="text-verde-green text-sm">Uploading files, please wait…</div>';
 
+    const sessionId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const formData = new FormData(uploadForm);
     try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'x-session-id': sessionId },
+        body: formData
+      });
       const data = await res.json();
       if (data.success) {
         window.location.href = `/dashboard/${data.sessionId}`;
