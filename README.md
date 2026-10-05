@@ -8,6 +8,8 @@ Upload your `endsong_*.json` files (or the whole ZIP export), pick a date range,
 
 ## Features
 
+- English by default, with an EN/DE switch that remembers your choice locally
+- Expandable Spotify data tutorial above the file picker and in the navigation
 - Drag & drop upload for JSON files or ZIP archives
 - Custom date range filtering
 - Top 10 songs, artists, and albums by listening time
@@ -37,9 +39,9 @@ docker-compose up -d
 ### 1. Get your Spotify data
 
 1. Go to [Spotify Privacy Settings](https://www.spotify.com/account/privacy/)
-2. Request **Extended Streaming History**
-3. Wait for the email and download the ZIP
-4. Extract the ZIP to access the `endsong_*.json` files
+2. Under **Extended streaming history**, select **Request data** (German: **Dein erweiterter Streamingverlauf → Daten anfordern**)
+3. Follow Spotify's instructions, confirm by email if prompted, then wait for the download email
+4. Download the ZIP. You can upload it directly, or extract it and select all `Streaming_History_Audio_*.json` / `endsong_*.json` files together. If the ZIP contains a subfolder, extract it first and select the JSON files.
 
 ### 2. Upload your data
 

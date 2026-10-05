@@ -2,37 +2,37 @@
 <%- include('partials/nav') %>
 
 <div class="mb-6">
-  <a href="/" class="text-sm text-verde-green hover:text-white transition-colors">← Back to upload</a>
+  <a href="/" class="text-sm text-verde-green hover:text-white transition-colors" data-i18n="← Back to upload">← Back to upload</a>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
   <div class="panel p-6 rounded-xl lg:col-span-1">
-    <h2 class="text-lg font-bold text-white mb-4">Analysis Settings</h2>
+    <h2 class="text-lg font-bold text-white mb-4" data-i18n="Analysis Settings">Analysis Settings</h2>
     <form id="analyze-form" class="space-y-4">
       <div>
-        <label class="form-label">Start Date</label>
+        <label for="start-date" class="form-label" data-i18n="Start Date">Start Date</label>
         <input type="date" id="start-date" name="startDate" class="input-field" required>
       </div>
       <div>
-        <label class="form-label">End Date</label>
+        <label for="end-date" class="form-label" data-i18n="End Date">End Date</label>
         <input type="date" id="end-date" name="endDate" class="input-field" required>
       </div>
       <div>
-        <label class="form-label">Minimum listen time (ms)</label>
+        <label for="min-ms" class="form-label" data-i18n="Minimum listen time (ms)">Minimum listen time (ms)</label>
         <input type="number" id="min-ms" name="minMs" value="0" min="0" step="1000" class="input-field">
-        <p class="hint">Skip streams shorter than this. 30000 = 30 seconds.</p>
+        <p class="hint" data-i18n="Skip streams shorter than this. 30000 = 30 seconds.">Skip streams shorter than this. 30000 = 30 seconds.</p>
       </div>
-      <button type="submit" id="analyze-btn" class="btn-primary w-full">Run Analysis</button>
+      <button type="submit" id="analyze-btn" class="btn-primary w-full" data-i18n="Run Analysis">Run Analysis</button>
     </form>
     <div id="status-msg" class="mt-4 hidden text-sm"></div>
   </div>
 
   <div class="panel p-6 rounded-xl lg:col-span-2 flex flex-col justify-center items-center text-center" id="empty-state">
-    <div class="w-20 h-20 mb-4 rounded-full bg-verde-green/10 flex items-center justify-center shadow-green-glow">
+    <div class="w-20 h-20 mb-4 rounded-full bg-verde-green/10 flex items-center justify-center">
       <svg class="w-10 h-10 text-verde-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
     </div>
-    <h3 class="text-xl font-bold text-white mb-2">Ready to analyze</h3>
-    <p class="text-neutral-400 max-w-md">Choose a date range and click "Run Analysis" to generate your personalized Spotify statistics.</p>
+    <h3 class="text-xl font-bold text-white mb-2" data-i18n="Ready to analyze">Ready to analyze</h3>
+    <p class="text-neutral-400 max-w-md" data-i18n="Choose a date range and click &quot;Run Analysis&quot; to generate your personalized Spotify statistics.">Choose a date range and click "Run Analysis" to generate your personalized Spotify statistics.</p>
   </div>
 </div>
 
@@ -41,22 +41,22 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="panel p-6 rounded-xl">
-      <h2 class="text-lg font-bold text-white mb-4">Top 10 Songs</h2>
+      <h2 class="text-lg font-bold text-white mb-4" data-i18n="Top 10 Songs">Top 10 Songs</h2>
       <div id="top-songs" class="space-y-3"></div>
     </div>
     <div class="panel p-6 rounded-xl">
-      <h2 class="text-lg font-bold text-white mb-4">Top 10 Artists</h2>
+      <h2 class="text-lg font-bold text-white mb-4" data-i18n="Top 10 Artists">Top 10 Artists</h2>
       <div id="top-artists" class="space-y-3"></div>
     </div>
   </div>
 
   <div class="panel p-6 rounded-xl">
-    <h2 class="text-lg font-bold text-white mb-4">Listening by Month</h2>
+    <h2 class="text-lg font-bold text-white mb-4" data-i18n="Listening by Month">Listening by Month</h2>
     <div id="monthly-chart" class="space-y-2"></div>
   </div>
 
   <div class="panel p-6 rounded-xl">
-    <h2 class="text-lg font-bold text-white mb-4">Insights</h2>
+    <h2 class="text-lg font-bold text-white mb-4" data-i18n="Insights">Insights</h2>
     <div id="insights" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm"></div>
   </div>
 </div>
@@ -102,9 +102,12 @@
     const btn = document.getElementById('analyze-btn');
     const status = document.getElementById('status-msg');
     btn.disabled = true;
-    btn.textContent = 'Analyzing…';
+    btn.dataset.i18n = 'Analyzing…';
+    btn.textContent = i18n.t('Analyzing…');
     status.classList.remove('hidden');
-    status.innerHTML = '<span class="text-verde-green">Crunching your data…</span>';
+    status.className = 'mt-4 text-sm text-verde-green';
+    status.dataset.i18n = 'Crunching your data…';
+    status.textContent = i18n.t(status.dataset.i18n);
 
     try {
       const res = await fetch('/api/analyze', {
@@ -122,33 +125,40 @@
       renderResult(data.result);
       status.classList.add('hidden');
     } catch (err) {
-      status.innerHTML = `<span class="text-red-400">${err.message}</span>`;
+      status.className = 'mt-4 text-sm text-red-400';
+      status.dataset.i18n = err.message;
+      status.textContent = i18n.t(err.message);
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Run Analysis';
+      btn.dataset.i18n = 'Run Analysis';
+      btn.textContent = i18n.t('Run Analysis');
     }
   });
 
+  let lastResult = null;
+  document.addEventListener('languagechange', () => { if (lastResult) renderResult(lastResult); });
+
   function renderResult(result) {
+    lastResult = result;
     document.getElementById('empty-state').classList.add('hidden');
     document.getElementById('results').classList.remove('hidden');
 
     const t = result.totals;
     document.getElementById('stat-cards').innerHTML = `
       <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Total Time</div>
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Total Time')}</div>
         <div class="text-2xl font-extrabold text-white">${formatDuration(t.duration)}</div>
       </div>
       <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Streams</div>
-        <div class="text-2xl font-extrabold text-white">${t.streams.toLocaleString()}</div>
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Streams')}</div>
+        <div class="text-2xl font-extrabold text-white">${t.streams.toLocaleString(i18n.locale)}</div>
       </div>
       <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Avg / Stream</div>
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Avg / Stream')}</div>
         <div class="text-2xl font-extrabold text-white">${t.avgDurationString}</div>
       </div>
       <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Files</div>
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Files')}</div>
         <div class="text-2xl font-extrabold text-white">${result.fileCount}</div>
       </div>
     `;
@@ -156,39 +166,39 @@
     const maxSong = result.topSongs[0]?.ms || 1;
     document.getElementById('top-songs').innerHTML = result.topSongs.length
       ? result.topSongs.map((s, i) => renderBar(s.name, s.durationString, s.ms, maxSong, i + 1)).join('')
-      : '<div class="text-neutral-500 italic">No songs found in this range.</div>';
+      : `<div class="text-neutral-500 italic">${i18n.t('No songs found in this range.')}</div>`;
 
     const maxArtist = result.topArtists[0]?.ms || 1;
     document.getElementById('top-artists').innerHTML = result.topArtists.length
       ? result.topArtists.map((a, i) => renderBar(a.name, a.durationString, a.ms, maxArtist, i + 1)).join('')
-      : '<div class="text-neutral-500 italic">No artists found in this range.</div>';
+      : `<div class="text-neutral-500 italic">${i18n.t('No artists found in this range.')}</div>`;
 
     const monthly = result.insights.monthlyListening;
     const maxMonthly = monthly.length ? Math.max(...monthly.map(m => m.ms)) : 1;
     document.getElementById('monthly-chart').innerHTML = monthly.length
       ? monthly.map(m => renderBar(m.month, m.durationString, m.ms, maxMonthly, '')).join('')
-      : '<div class="text-neutral-500 italic">No monthly data.</div>';
+      : `<div class="text-neutral-500 italic">${i18n.t('No monthly data.')}</div>`;
 
     document.getElementById('insights').innerHTML = `
       <div class="panel p-4 rounded-xl">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Peak Hour</div>
-        <div class="text-xl font-extrabold text-white">${String(result.insights.topHour).padStart(2, '0')}:00</div>
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Peak Hour')}</div>
+        <div class="text-xl font-extrabold text-white">${t.streams ? String(result.insights.topHour).padStart(2, '0') + ':00' : '-'}</div>
       </div>
       <div class="panel p-4 rounded-xl">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Top Day</div>
-        <div class="text-xl font-extrabold text-white">${result.insights.topWeekday}</div>
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Top Day')}</div>
+        <div class="text-xl font-extrabold text-white">${t.streams ? i18n.t(result.insights.topWeekday) : '-'}</div>
       </div>
       <div class="panel p-4 rounded-xl">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">First Stream</div>
-        <div class="text-xl font-extrabold text-white">${result.dateRange.firstStream ? new Date(result.dateRange.firstStream).toLocaleDateString() : '-'}</div>
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('First Stream')}</div>
+        <div class="text-xl font-extrabold text-white">${result.dateRange.firstStream ? new Date(result.dateRange.firstStream).toLocaleDateString(i18n.locale) : '-'}</div>
       </div>
       <div class="panel p-4 rounded-xl">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">Top Platform</div>
-        <div class="text-xl font-extrabold text-white truncate" title="${result.insights.topPlatforms[0]?.name || '-'}">${result.insights.topPlatforms[0]?.name || '-'}</div>
+        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Top Platform')}</div>
+        <div class="text-xl font-extrabold text-white truncate" title="${i18n.t(result.insights.topPlatforms[0]?.name || '-')}">${i18n.t(result.insights.topPlatforms[0]?.name || '-')}</div>
       </div>
     `;
 
-    window.scrollTo({ top: document.getElementById('results').offsetTop - 100, behavior: 'smooth' });
+
   }
 </script>
 

@@ -3,36 +3,57 @@
 
 <div class="max-w-3xl mx-auto">
   <div class="text-center mb-10">
-    <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
-      Your Spotify. <span class="text-verde-green">Visualized.</span>
+    <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight" data-i18n="Spotify listening statistics">
+      Spotify listening statistics
     </h1>
-    <p class="text-neutral-400 text-lg">
-      Upload your Extended Streaming History and explore your top songs, artists, and listening habits in a green-themed dashboard.
+    <p class="text-neutral-400 text-lg" data-i18n="Upload your Extended Streaming History to explore your top songs, artists, and listening habits.">
+      Upload your Extended Streaming History to explore your top songs, artists, and listening habits.
     </p>
   </div>
 
-  <div class="panel p-8 rounded-xl mb-8">
-    <h2 class="text-xl font-bold text-white mb-2">Upload Streaming History</h2>
+  <div class="panel p-5 sm:p-8 rounded-xl mb-8">
+    <h2 class="text-xl font-bold text-white mb-2" data-i18n="Upload Streaming History">Upload Streaming History</h2>
     <p class="text-neutral-400 text-sm mb-6">
-      Select all <code class="bg-black/50 px-1.5 py-0.5 rounded text-verde-green font-mono text-xs">Streaming_History_Audio_*.json</code> / <code class="bg-black/50 px-1.5 py-0.5 rounded text-verde-green font-mono text-xs">endsong_*.json</code> files from your Spotify data export, or upload the entire ZIP archive.
+      <span data-i18n="Select all">Select all</span> <code class="bg-black/50 px-1.5 py-0.5 rounded text-verde-green font-mono text-xs">Streaming_History_Audio_*.json</code> / <code class="bg-black/50 px-1.5 py-0.5 rounded text-verde-green font-mono text-xs">endsong_*.json</code> <span data-i18n="files from your Spotify data export, or upload the entire ZIP archive.">files from your Spotify data export, or upload the entire ZIP archive.</span>
     </p>
+
+
+    <details id="tutorial" class="tutorial mb-6">
+      <summary class="font-semibold text-verde-green" data-i18n="Tutorial">Tutorial</summary>
+      <div class="pt-4 text-sm text-neutral-300">
+        <h3 class="text-lg font-bold text-white mb-4" data-i18n="How to get your Spotify data">How to get your Spotify data</h3>
+        <ol class="list-decimal pl-5 space-y-5">
+          <li><a id="spotify-privacy-link" href="https://www.spotify.com/en/account/privacy/" target="_blank" rel="noopener noreferrer" class="text-verde-green underline" data-i18n="Open Spotify privacy settings">Open Spotify privacy settings</a>
+            <p class="mt-1" data-i18n="Sign in to the Spotify account whose listening history you want to analyze.">Sign in to the Spotify account whose listening history you want to analyze.</p></li>
+          <li><h4 class="font-semibold text-white" data-i18n="Request your extended history">Request your extended history</h4>
+            <p class="mt-1" data-i18n="Scroll to “Download your data”. Under “Extended streaming history”, select “Request data”. This package covers the lifetime of your account; the regular account data only includes the past year of listening history.">Scroll to “Download your data”. Under “Extended streaming history”, select “Request data”. This package covers the lifetime of your account; the regular account data only includes the past year of listening history.</p></li>
+          <li><h4 class="font-semibold text-white" data-i18n="Confirm the request and wait for the download">Confirm the request and wait for the download</h4>
+            <p class="mt-1" data-i18n="Follow Spotify’s instructions and confirm the request by email if prompted. Spotify will email you when your export is ready. Preparing it can take time; check the estimate shown on the request page and your spam folder.">Follow Spotify’s instructions and confirm the request by email if prompted. Spotify will email you when your export is ready. Preparing it can take time; check the estimate shown on the request page and your spam folder.</p></li>
+          <li><h4 class="font-semibold text-white" data-i18n="Download and upload your history">Download and upload your history</h4>
+            <p class="mt-1" data-i18n="Download the ZIP using the link in Spotify’s email. Upload that ZIP here, or extract it and select all history JSON files together:">Download the ZIP using the link in Spotify’s email. Upload that ZIP here, or extract it and select all history JSON files together:</p>
+            <p class="font-mono text-xs my-2 break-all">Streaming_History_Audio_*.json / endsong_*.json</p>
+            <p data-i18n="If uploading the ZIP finds no files, extract it first: the JSON files may be inside a subfolder. Then click “Analyze Upload” and choose your date range on the dashboard.">If uploading the ZIP finds no files, extract it first: the JSON files may be inside a subfolder. Then click “Analyze Upload” and choose your date range on the dashboard.</p></li>
+        </ol>
+        <a href="https://support.spotify.com/us/article/understanding-your-data/" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 text-verde-green underline" data-i18n="Spotify’s official data guide">Spotify’s official data guide</a>
+      </div>
+    </details>
 
     <form id="upload-form" action="/api/upload" method="POST" enctype="multipart/form-data" class="space-y-5">
       <div
         id="drop-zone"
-        class="drop-zone rounded-xl p-10 text-center cursor-pointer"
+        class="drop-zone rounded-xl p-10 text-center cursor-pointer" role="button" tabindex="0" data-i18n-aria="Choose files" aria-label="Choose files"
       >
         <input type="file" name="files" id="file-input" multiple accept=".json,.zip" class="hidden" />
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-verde-green/10 flex items-center justify-center shadow-green-glow">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-verde-green/10 flex items-center justify-center">
           <svg class="w-8 h-8 text-verde-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
         </div>
-        <p class="text-white font-semibold mb-1">Drop files here or click to browse</p>
-        <p class="text-neutral-500 text-sm">JSON files or a single ZIP archive</p>
+        <p class="text-white font-semibold mb-1" data-i18n="Drop files here or click to browse">Drop files here or click to browse</p>
+        <p class="text-neutral-500 text-sm" data-i18n="JSON files or a single ZIP archive">JSON files or a single ZIP archive</p>
       </div>
 
       <div id="file-list" class="hidden space-y-2"></div>
 
-      <button type="submit" id="upload-btn" class="btn-primary w-full" disabled>
+      <button type="submit" id="upload-btn" class="btn-primary w-full" disabled data-i18n="Analyze Upload">
         Analyze Upload
       </button>
     </form>
@@ -42,16 +63,16 @@
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
     <div class="panel p-5 rounded-xl text-center">
-      <div class="text-verde-green text-2xl font-extrabold mb-1">Top 10</div>
-      <div class="text-neutral-400">Songs & Artists</div>
+      <div class="text-verde-green text-2xl font-extrabold mb-1" data-i18n="Top 10">Top 10</div>
+      <div class="text-neutral-400" data-i18n="Songs & Artists">Songs & Artists</div>
     </div>
     <div class="panel p-5 rounded-xl text-center">
-      <div class="text-verde-green text-2xl font-extrabold mb-1">Time Range</div>
-      <div class="text-neutral-400">Custom date filter</div>
+      <div class="text-verde-green text-2xl font-extrabold mb-1" data-i18n="Time Range">Time Range</div>
+      <div class="text-neutral-400" data-i18n="Custom date filter">Custom date filter</div>
     </div>
     <div class="panel p-5 rounded-xl text-center">
-      <div class="text-verde-green text-2xl font-extrabold mb-1">Insights</div>
-      <div class="text-neutral-400">Hours, weekdays, platforms</div>
+      <div class="text-verde-green text-2xl font-extrabold mb-1" data-i18n="Insights">Insights</div>
+      <div class="text-neutral-400" data-i18n="Hours, weekdays, platforms">Hours, weekdays, platforms</div>
     </div>
   </div>
 </div>
@@ -65,6 +86,21 @@
   const uploadStatus = document.getElementById('upload-status');
 
   dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+  function updatePrivacyLink() {
+    document.getElementById('spotify-privacy-link').href = `https://www.spotify.com/${i18n.language === 'de' ? 'de' : 'en'}/account/privacy/`;
+  }
+  function openTutorial() {
+    if (location.hash === '#tutorial') document.getElementById('tutorial').open = true;
+  }
+  document.addEventListener('DOMContentLoaded', () => { updatePrivacyLink(); openTutorial(); });
+  document.addEventListener('languagechange', updatePrivacyLink);
+  window.addEventListener('hashchange', openTutorial);
+  document.querySelectorAll('a[href="/#tutorial"]').forEach(link => link.addEventListener('click', () => {
+    document.getElementById('tutorial').open = true;
+  }));
 
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -104,9 +140,12 @@
   uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     uploadBtn.disabled = true;
-    uploadBtn.textContent = 'Uploading…';
+    uploadBtn.dataset.i18n = 'Uploading…';
+    uploadBtn.textContent = i18n.t('Uploading…');
     uploadStatus.classList.remove('hidden');
-    uploadStatus.innerHTML = '<div class="text-verde-green text-sm">Uploading files, please wait…</div>';
+    uploadStatus.className = 'mt-4 text-verde-green text-sm';
+    uploadStatus.dataset.i18n = 'Uploading files, please wait…';
+    uploadStatus.textContent = i18n.t(uploadStatus.dataset.i18n);
 
     const sessionId = (typeof crypto !== 'undefined' && crypto.randomUUID)
       ? crypto.randomUUID()
@@ -125,9 +164,12 @@
         throw new Error(data.error || 'Upload failed');
       }
     } catch (err) {
-      uploadStatus.innerHTML = `<div class="text-red-400 text-sm">Error: ${err.message}</div>`;
+      uploadStatus.className = 'mt-4 text-red-400 text-sm';
+      uploadStatus.dataset.i18n = err.message;
+      uploadStatus.textContent = i18n.t(err.message);
       uploadBtn.disabled = false;
-      uploadBtn.textContent = 'Analyze Upload';
+      uploadBtn.dataset.i18n = 'Analyze Upload';
+      uploadBtn.textContent = i18n.t('Analyze Upload');
     }
   });
 </script>

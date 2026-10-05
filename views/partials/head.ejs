@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title || 'VerdeStats' %></title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script src="/i18n.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -34,23 +36,18 @@
       font-family: 'Inter', sans-serif;
       background-color: #050505;
       color: #f0f0f0;
-      background-image:
-        radial-gradient(circle at 20% 0%, rgba(0, 255, 119, 0.08) 0%, transparent 35%),
-        radial-gradient(circle at 80% 100%, rgba(0, 255, 119, 0.05) 0%, transparent 30%),
-        linear-gradient(rgba(0, 255, 119, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 119, 0.04) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+
     }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     .verde-line {
-      background: linear-gradient(90deg, transparent, rgba(0, 255, 119, 0.5), transparent);
+      background: #2a2a2a;
       height: 1px;
     }
     .panel {
       background: rgba(12, 12, 12, 0.92);
       border: 1px solid #2a2a2a;
       border-radius: 0.75rem;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      box-shadow: none;
       backdrop-filter: blur(8px);
     }
     .btn-primary {
@@ -59,7 +56,7 @@
       justify-content: center;
       gap: 0.5rem;
       padding: 0.6rem 1.25rem;
-      background: linear-gradient(135deg, #00ff77 0%, #00cc5f 100%);
+      background: #00cc70;
       color: #000000;
       font-weight: 800;
       font-size: 0.875rem;
@@ -67,12 +64,12 @@
       border-radius: 0.5rem;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 0 12px rgba(0, 255, 119, 0.35);
+      box-shadow: none;
     }
     .btn-primary:hover {
-      background: linear-gradient(135deg, #33ff99 0%, #00ff77 100%);
-      box-shadow: 0 0 20px rgba(0, 255, 119, 0.6);
-      transform: translateY(-1px);
+      background: #33db8b;
+      box-shadow: none;
+
     }
     .input-field {
       width: 100%;
@@ -89,7 +86,7 @@
     .input-field:hover { border-color: #555; }
     .input-field:focus {
       border-color: #00ff77;
-      box-shadow: 0 0 0 3px rgba(0, 255, 119, 0.15), 0 0 16px rgba(0, 255, 119, 0.25);
+      box-shadow: none;
       background: #1a1a1a;
     }
     .nav-link {
@@ -109,7 +106,7 @@
       color: #00ff77;
       background: rgba(0, 255, 119, 0.1);
       border: 1px solid rgba(0, 255, 119, 0.35);
-      box-shadow: 0 0 12px rgba(0, 255, 119, 0.15);
+      box-shadow: none;
     }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0a0a0a; }
@@ -140,10 +137,21 @@
     .drop-zone.dragover {
       border-color: #00ff77;
       background: rgba(0, 255, 119, 0.08);
-      box-shadow: 0 0 24px rgba(0, 255, 119, 0.15);
+      box-shadow: none;
     }
     .bar-bg { background: #1a1a1a; border-radius: 9999px; overflow: hidden; }
-    .bar-fill { background: linear-gradient(90deg, #00ff77, #00cc5f); height: 100%; border-radius: 9999px; }
+    .bar-fill { background: #00cc70; height: 100%; border-radius: 9999px; }
+    .shadow-green-glow { box-shadow: none; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .language-switch { display: flex; gap: 2px; padding: 3px; border: 1px solid #3a3a3a; border-radius: 6px; }
+    .language-switch button { padding: 6px 10px; border-radius: 4px; color: #aaa; font-weight: 600; font-size: 12px; }
+    .language-switch button[aria-pressed="true"] { background: #153d29; color: #66e6a4; }
+    .tutorial { padding: 14px 16px; background: #111; border: 1px solid #303030; border-radius: 8px; }
+    .tutorial summary { cursor: pointer; }
+    .tutorial p { line-height: 1.65; }
+    #tutorial { scroll-margin-top: 130px; }
+    @media (max-width: 767px) { .nav-link { padding: 0.5rem 0.65rem; font-size: 0.75rem; } }
+    :where(button, a, summary, [role="button"]):focus-visible { outline: 2px solid #66e6a4; outline-offset: 4px; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
