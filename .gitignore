@@ -5,3 +5,5 @@ uploads/*
 test-data/
 npm-debug.log*
 .DS_Store
+
+dist/

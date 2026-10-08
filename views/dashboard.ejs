@@ -1,205 +1,36 @@
-<%- include('partials/head', { title: 'Dashboard | VerdeStats' }) %>
-<%- include('partials/nav') %>
 
-<div class="mb-6">
-  <a href="/" class="text-sm text-verde-green hover:text-white transition-colors" data-i18n="← Back to upload">← Back to upload</a>
-</div>
-
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-  <div class="panel p-6 rounded-xl lg:col-span-1">
-    <h2 class="text-lg font-bold text-white mb-4" data-i18n="Analysis Settings">Analysis Settings</h2>
-    <form id="analyze-form" class="space-y-4">
-      <div>
-        <label for="start-date" class="form-label" data-i18n="Start Date">Start Date</label>
-        <input type="date" id="start-date" name="startDate" class="input-field" required>
-      </div>
-      <div>
-        <label for="end-date" class="form-label" data-i18n="End Date">End Date</label>
-        <input type="date" id="end-date" name="endDate" class="input-field" required>
-      </div>
-      <div>
-        <label for="min-ms" class="form-label" data-i18n="Minimum listen time (ms)">Minimum listen time (ms)</label>
-        <input type="number" id="min-ms" name="minMs" value="0" min="0" step="1000" class="input-field">
-        <p class="hint" data-i18n="Skip streams shorter than this. 30000 = 30 seconds.">Skip streams shorter than this. 30000 = 30 seconds.</p>
-      </div>
-      <button type="submit" id="analyze-btn" class="btn-primary w-full" data-i18n="Run Analysis">Run Analysis</button>
+<div class="app-shell" id="app" hidden>
+  <aside class="sidebar">
+    <a href="/" class="brand"><img src="/favicon.svg" alt="" width="32" height="32"><span>Verde<span class="brand-accent">Stats</span></span></a>
+    <span class="sidebar-label" data-i18n="YOUR LIBRARY">YOUR LIBRARY</span>
+    <nav class="app-nav" aria-label="Main navigation" data-i18n-aria="Main navigation">
+      <button type="button" data-view="overview" class="active"><span class="nav-icon" aria-hidden="true">▦</span><span data-i18n="Overview">Overview</span></button>
+      <button type="button" data-view="songs"><span class="nav-icon" aria-hidden="true">♫</span><span data-i18n="Songs">Songs</span></button>
+      <button type="button" data-view="artists"><span class="nav-icon" aria-hidden="true">♬</span><span data-i18n="Artists">Artists</span></button>
+      <button type="button" data-view="albums"><span class="nav-icon" aria-hidden="true">▣</span><span data-i18n="Albums">Albums</span></button>
+      <span class="nav-divider"></span>
+      <button type="button" data-view="history"><span class="nav-icon" aria-hidden="true">▥</span><span data-i18n="History">History</span></button>
+      <button type="button" data-view="listening"><span class="nav-icon" aria-hidden="true">◷</span><span data-i18n="Listening">Listening</span></button>
+      <button type="button" data-view="data"><span class="nav-icon" aria-hidden="true">⇧</span><span data-i18n="Data">Data</span></button>
+    </nav>
+    <div class="sidebar-bottom"><div class="session-indicator"><span class="status-dot"></span><span data-i18n="Browser only">Browser only</span></div><button type="button" class="button secondary full-width" data-discard data-i18n="Discard data">Discard data</button><div class="language-switch" role="group" aria-label="Language / Sprache"><button type="button" data-language="en" aria-pressed="true">EN</button><button type="button" data-language="de" aria-pressed="false">DE</button></div><span class="language-hint" data-i18n="Language is saved in this browser.">Language is saved in this browser.</span><span class="timezone-note" id="timezone-note"></span></div>
+  </aside>
+  <div class="app-main">
+    <header class="app-header"><div><span class="eyebrow" data-i18n="LISTENING STATISTICS">LISTENING STATISTICS</span><h1 id="view-title" data-i18n="Overview">Overview</h1></div><div class="global-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="19" height="19" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><label for="global-search" class="sr-only" data-i18n="Search songs, artists and albums">Search songs, artists and albums</label><input id="global-search" type="search" autocomplete="off" placeholder="Search your music…" data-i18n-placeholder="Search your music…"><div id="search-results" class="search-results" hidden></div></div></header>
+    <form id="filter-form" class="filter-bar">
+      <label><span data-i18n="Period">Period</span><select id="period"><option value="all" data-i18n="All imported history">All imported history</option><option value="year" data-i18n="Year">Year</option><option value="month" data-i18n="Month">Month</option><option value="custom" data-i18n="Custom dates">Custom dates</option></select></label>
+      <label id="year-field" hidden><span data-i18n="Year">Year</span><select id="period-year"></select></label><label id="month-field" hidden><span data-i18n="Month">Month</span><input id="period-month" type="month"></label>
+      <label><span data-i18n="From">From</span><input type="date" id="start-date" required></label><label><span data-i18n="Through">Through</span><input type="date" id="end-date" required></label>
+      <label><span data-i18n="Content">Content</span><select id="content-type"><option value="music" data-i18n="Music">Music</option><option value="podcast" data-i18n="Podcasts">Podcasts</option><option value="all" data-i18n="Music + podcasts">Music + podcasts</option></select></label>
+      <label><span data-i18n="Minimum seconds">Minimum seconds</span><input type="number" id="min-seconds" value="0" min="0" max="86400" step="1" list="minimum-options"><datalist id="minimum-options"><option value="0"><option value="10"><option value="30"><option value="60"></datalist></label>
+      <button type="submit" id="analyze-btn" class="button primary" data-i18n="Apply">Apply</button>
     </form>
-    <div id="status-msg" class="mt-4 hidden text-sm"></div>
-  </div>
-
-  <div class="panel p-6 rounded-xl lg:col-span-2 flex flex-col justify-center items-center text-center" id="empty-state">
-    <div class="w-20 h-20 mb-4 rounded-full bg-verde-green/10 flex items-center justify-center">
-      <svg class="w-10 h-10 text-verde-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-    </div>
-    <h3 class="text-xl font-bold text-white mb-2" data-i18n="Ready to analyze">Ready to analyze</h3>
-    <p class="text-neutral-400 max-w-md" data-i18n="Choose a date range and click &quot;Run Analysis&quot; to generate your personalized Spotify statistics.">Choose a date range and click "Run Analysis" to generate your personalized Spotify statistics.</p>
+    <div class="range-caption"><span id="range-summary"></span><span id="timezone-caption"></span></div>
+    <div id="job-progress" class="progress-box" hidden><div class="progress-meta"><span id="job-stage" data-i18n="Analyzing your history…">Analyzing your history…</span><span id="job-percent"></span></div><progress id="job-bar" max="100" value="0" aria-label="Analysis progress" data-i18n-aria="Analysis progress"></progress></div>
+    <div id="app-status" class="status" role="status" aria-live="polite"></div>
+    <main id="view-content" aria-live="polite"><div class="initial-state"><img src="/favicon.svg" width="52" height="52" alt=""><h2 data-i18n="Preparing your listening history">Preparing your listening history</h2><p class="muted" data-i18n="Your dashboard will open automatically when the analysis is ready.">Your dashboard will open automatically when the analysis is ready.</p></div></main>
+    <footer class="dashboard-footer"><span>VerdeStats</span><span data-i18n="Based only on the files in this session.">Based only on the files in this session.</span></footer>
   </div>
 </div>
-
-<div id="results" class="hidden space-y-6">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="stat-cards"></div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="panel p-6 rounded-xl">
-      <h2 class="text-lg font-bold text-white mb-4" data-i18n="Top 10 Songs">Top 10 Songs</h2>
-      <div id="top-songs" class="space-y-3"></div>
-    </div>
-    <div class="panel p-6 rounded-xl">
-      <h2 class="text-lg font-bold text-white mb-4" data-i18n="Top 10 Artists">Top 10 Artists</h2>
-      <div id="top-artists" class="space-y-3"></div>
-    </div>
-  </div>
-
-  <div class="panel p-6 rounded-xl">
-    <h2 class="text-lg font-bold text-white mb-4" data-i18n="Listening by Month">Listening by Month</h2>
-    <div id="monthly-chart" class="space-y-2"></div>
-  </div>
-
-  <div class="panel p-6 rounded-xl">
-    <h2 class="text-lg font-bold text-white mb-4" data-i18n="Insights">Insights</h2>
-    <div id="insights" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm"></div>
-  </div>
-</div>
-
-<script>
-  const sessionId = '<%= sessionId %>';
-
-  // Default date range: last 365 days
-  const end = new Date();
-  const start = new Date();
-  start.setDate(start.getDate() - 365);
-  document.getElementById('end-date').value = end.toISOString().split('T')[0];
-  document.getElementById('start-date').value = start.toISOString().split('T')[0];
-
-  function formatDuration(d) {
-    const parts = [];
-    if (d.hours > 0) parts.push(`${d.hours}h`);
-    if (d.minutes > 0) parts.push(`${d.minutes}m`);
-    if (d.seconds > 0 || parts.length === 0) parts.push(`${d.seconds}s`);
-    return parts.join(' ');
-  }
-
-  function renderBar(label, sub, ms, maxMs, index) {
-    const pct = maxMs ? Math.max((ms / maxMs) * 100, 1) : 0;
-    return `
-      <div class="flex items-center gap-3 text-sm">
-        <div class="w-6 text-center font-mono text-verde-green font-bold">${index}</div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between mb-1">
-            <span class="text-white font-medium truncate" title="${label}">${label}</span>
-            <span class="text-neutral-400 font-mono whitespace-nowrap ml-2">${sub}</span>
-          </div>
-          <div class="bar-bg h-2">
-            <div class="bar-fill" style="width: ${pct}%"></div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  document.getElementById('analyze-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('analyze-btn');
-    const status = document.getElementById('status-msg');
-    btn.disabled = true;
-    btn.dataset.i18n = 'Analyzing…';
-    btn.textContent = i18n.t('Analyzing…');
-    status.classList.remove('hidden');
-    status.className = 'mt-4 text-sm text-verde-green';
-    status.dataset.i18n = 'Crunching your data…';
-    status.textContent = i18n.t(status.dataset.i18n);
-
-    try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId,
-          startDate: document.getElementById('start-date').value,
-          endDate: document.getElementById('end-date').value,
-          minMs: Number(document.getElementById('min-ms').value)
-        })
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Analysis failed');
-      renderResult(data.result);
-      status.classList.add('hidden');
-    } catch (err) {
-      status.className = 'mt-4 text-sm text-red-400';
-      status.dataset.i18n = err.message;
-      status.textContent = i18n.t(err.message);
-    } finally {
-      btn.disabled = false;
-      btn.dataset.i18n = 'Run Analysis';
-      btn.textContent = i18n.t('Run Analysis');
-    }
-  });
-
-  let lastResult = null;
-  document.addEventListener('languagechange', () => { if (lastResult) renderResult(lastResult); });
-
-  function renderResult(result) {
-    lastResult = result;
-    document.getElementById('empty-state').classList.add('hidden');
-    document.getElementById('results').classList.remove('hidden');
-
-    const t = result.totals;
-    document.getElementById('stat-cards').innerHTML = `
-      <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Total Time')}</div>
-        <div class="text-2xl font-extrabold text-white">${formatDuration(t.duration)}</div>
-      </div>
-      <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Streams')}</div>
-        <div class="text-2xl font-extrabold text-white">${t.streams.toLocaleString(i18n.locale)}</div>
-      </div>
-      <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Avg / Stream')}</div>
-        <div class="text-2xl font-extrabold text-white">${t.avgDurationString}</div>
-      </div>
-      <div class="panel p-4 rounded-xl border-l-4 border-verde-green">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Files')}</div>
-        <div class="text-2xl font-extrabold text-white">${result.fileCount}</div>
-      </div>
-    `;
-
-    const maxSong = result.topSongs[0]?.ms || 1;
-    document.getElementById('top-songs').innerHTML = result.topSongs.length
-      ? result.topSongs.map((s, i) => renderBar(s.name, s.durationString, s.ms, maxSong, i + 1)).join('')
-      : `<div class="text-neutral-500 italic">${i18n.t('No songs found in this range.')}</div>`;
-
-    const maxArtist = result.topArtists[0]?.ms || 1;
-    document.getElementById('top-artists').innerHTML = result.topArtists.length
-      ? result.topArtists.map((a, i) => renderBar(a.name, a.durationString, a.ms, maxArtist, i + 1)).join('')
-      : `<div class="text-neutral-500 italic">${i18n.t('No artists found in this range.')}</div>`;
-
-    const monthly = result.insights.monthlyListening;
-    const maxMonthly = monthly.length ? Math.max(...monthly.map(m => m.ms)) : 1;
-    document.getElementById('monthly-chart').innerHTML = monthly.length
-      ? monthly.map(m => renderBar(m.month, m.durationString, m.ms, maxMonthly, '')).join('')
-      : `<div class="text-neutral-500 italic">${i18n.t('No monthly data.')}</div>`;
-
-    document.getElementById('insights').innerHTML = `
-      <div class="panel p-4 rounded-xl">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Peak Hour')}</div>
-        <div class="text-xl font-extrabold text-white">${t.streams ? String(result.insights.topHour).padStart(2, '0') + ':00' : '-'}</div>
-      </div>
-      <div class="panel p-4 rounded-xl">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Top Day')}</div>
-        <div class="text-xl font-extrabold text-white">${t.streams ? i18n.t(result.insights.topWeekday) : '-'}</div>
-      </div>
-      <div class="panel p-4 rounded-xl">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('First Stream')}</div>
-        <div class="text-xl font-extrabold text-white">${result.dateRange.firstStream ? new Date(result.dateRange.firstStream).toLocaleDateString(i18n.locale) : '-'}</div>
-      </div>
-      <div class="panel p-4 rounded-xl">
-        <div class="text-neutral-400 text-xs uppercase font-bold tracking-wider mb-1">${i18n.t('Top Platform')}</div>
-        <div class="text-xl font-extrabold text-white truncate" title="${i18n.t(result.insights.topPlatforms[0]?.name || '-')}">${i18n.t(result.insights.topPlatforms[0]?.name || '-')}</div>
-      </div>
-    `;
-
-
-  }
-</script>
-
-<%- include('partials/footer') %>
+<dialog id="detail-dialog" class="detail-dialog"><div class="dialog-top"><span class="eyebrow" id="detail-kind"></span><button type="button" class="icon-button" data-close="detail-dialog" aria-label="Close" data-i18n-aria="Close">×</button></div><div id="detail-content"></div></dialog>
+<dialog id="widgets-dialog" class="settings-dialog"><div class="dialog-top"><h2 data-i18n="Customize overview">Customize overview</h2><button type="button" class="icon-button" data-close="widgets-dialog" aria-label="Close" data-i18n-aria="Close">×</button></div><p class="muted" data-i18n="Choose and reorder widgets. This layout is kept only while this page is open.">Choose and reorder widgets. This layout is kept only while this page is open.</p><div id="widget-settings"></div><button id="widgets-done" type="button" class="button primary" data-i18n="Done">Done</button></dialog>

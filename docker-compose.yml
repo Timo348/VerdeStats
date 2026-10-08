@@ -1,21 +1,15 @@
 services:
   verdestats:
     build: .
-    image: timo348/verdestats:latest
-    container_name: verdestats
+    image: verdestats:local
     restart: unless-stopped
-    env_file:
-      - .env
     ports:
-      - "30008:3000"
-    volumes:
-      - ./uploads:/app/uploads
-    networks:
-      - verdestats-net
-
-volumes:
-  verdestats-uploads:
-
-networks:
-  verdestats-net:
-    driver: bridge
+      - "127.0.0.1:30008:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=67108864,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 10s

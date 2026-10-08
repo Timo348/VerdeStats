@@ -1,22 +1,23 @@
 {
   "name": "verdestats",
-  "version": "1.0.0",
-  "description": "Spotify Extended Streaming History Analyzer with a green BeamMP-style dashboard",
+  "version": "2.0.0",
+  "description": "Local browser-only Spotify streaming history analysis",
   "main": "server.js",
   "scripts": {
+    "build": "node scripts/build.js",
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "node --test",
+    "check": "node scripts/check.js"
   },
-  "dependencies": {
-    "adm-zip": "^0.5.16",
-    "dotenv": "^16.4.5",
-    "ejs": "^3.1.10",
-    "express": "^4.19.2",
-    "multer": "^1.4.5-lts.1"
-  },
+  "dependencies": {},
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24.0.0"
   },
   "author": "Timo348",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "ejs": "3.1.10",
+    "fflate": "0.8.3"
+  }
 }
