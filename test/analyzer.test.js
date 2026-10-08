@@ -79,15 +79,7 @@ test('empty selected periods report zero and no invented peak or record', () => 
   assert.equal(result.insights.streak.days, 0);
 });
 
-test('forgotten favorites still require ten plays and ninety days without comeback or discovery classifications', () => {
-  const rows = Array.from({ length: 10 }, (_, i) => row(`2023-01-${String(i + 1).padStart(2, '0')}T12:00:00Z`, 'Forgotten', 'Old Artist'));
-  rows.push(row('2023-01-01T12:00:00Z', 'Returned', 'Returning Artist'), row('2024-01-01T12:00:00Z', 'Returned', 'Returning Artist'), row('2024-01-02T12:00:00Z', 'New', 'New Artist'));
-  const result = analyze(rows, { startDate: '2024-01-01', endDate: '2024-01-31' });
-  assert.ok(result.insights.forgotten.some(entity => entity.name === 'Forgotten' && entity.streams === 10));
-  assert.ok(!result.insights.forgotten.some(entity => entity.name === 'Returned'));
-});
-
-test('only current ranks remain with no previous-period, new-in-import or comeback DTO', () => {
+test('only current ranks remain with no previous-period, new-in-import, comeback or forgotten DTO', () => {
   const result = analyze([
     row('2024-01-01T12:00:00Z', 'A', 'Artist', { ms_played: 300000 }), row('2024-01-01T13:00:00Z', 'B', 'Artist'),
     row('2024-01-02T12:00:00Z', 'A', 'Artist'), row('2024-01-02T13:00:00Z', 'B', 'Artist', { ms_played: 300000 })
@@ -97,6 +89,7 @@ test('only current ranks remain with no previous-period, new-in-import or comeba
   assert.equal(result.library.songs[1].rank, 2);
   assert.equal('comparison' in result, false);
   assert.equal('comebacks' in result.insights, false);
+  assert.equal('forgotten' in result.insights, false);
   for (const entity of Object.values(result.library).flat()) {
     for (const field of ['previousRank', 'rankChange', 'isNew', 'comeback', 'returnedAt', 'daysAbsent']) assert.equal(field in entity, false, field);
   }

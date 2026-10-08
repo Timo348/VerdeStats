@@ -13,7 +13,7 @@ Stand: 8. Oktober 2026. Diese Roadmap hält die ursprünglichen 75 Vorschläge u
 
 ## Nächste Ausbaustufen
 
-1. **Zeitvergleiche und Entdeckungen (46–55):** separate Vergleichsansichten und nachvollziehbare Analysen auf den bereits lokal importierten Daten. Keine dauerhafte Speicherung und keine Rückkehr der entfernten Rangänderungsspalte, Import-Badges oder Comebacks.
+1. **Zeitvergleiche und Entdeckungen (46–55):** separate Vergleichsansichten und nachvollziehbare Analysen auf den bereits lokal importierten Daten. Keine dauerhafte Speicherung und keine Rückkehr der entfernten Rangänderungsspalte, Import-Badges, vergessenen Favoriten oder Comebacks.
 2. **Rückblicke (56–58):** Jahres-, Monats- und frei benannte Zeitraumrückblicke aus tatsächlichen Daten. Veränderungen und Entdeckungen beziehen sich auf die Abdeckung des importierten Archivs.
 3. **Lokale Exporte (61–62):** PDF und CSV zum bewussten Herunterladen auf das eigene Gerät.
 4. **Bildkarten und Poster (59–60):** erst Datenschutz und Nutzungsrechte prüfen, anschließend gegebenenfalls lokale Downloads ohne öffentliche Galerie oder Remote-Cover umsetzen.
@@ -62,7 +62,7 @@ Punkt 63 bleibt für später vorgemerkt. Abgelehnte Funktionen bleiben ausgeschl
 | 25 | Album-Detailseite | **Umgesetzt.** Enthaltene Tracks und deren Hörverteilung innerhalb des Imports. |
 | 26 | Rangveränderungen anzeigen | **Nachträglich ausdrücklich entfernt.** Keine „Change“-Spalte, Vorher-Ränge oder Auf-/Absteiger-Markierungen in den aktuellen Ranglisten. Künftige separate Zeitraumvergleiche nach 46/47 bleiben freigegeben. |
 | 27 | Neue Künstler entdecken | **Nachträglich ausdrücklich entfernt.** Kein „First in Import“/„Erstmals im Import“-Badge und kein entsprechender Listenfilter. Erste und letzte Wiedergabe bleiben sachliche Angaben in den Details. |
-| 28 | Vergessene Favoriten | **Umgesetzt.** Früher häufig gehörte Inhalte mit längerer Hörpause innerhalb des vorhandenen Archivs. |
+| 28 | Vergessene Favoriten | **Nachträglich ausdrücklich entfernt.** Kein „Forgotten Favorites“-/„Vergessene Favoriten“-Widget, Listenfilter oder entsprechende Auswertung mehr. |
 | 29 | Comebacks | **Nachträglich ausdrücklich entfernt.** Keine Comeback-Karte, Kennzeichnung oder Auswertung mehr. |
 | 30 | Persönliche Meilensteine | **Umgesetzt.** Wiedergabe- und Hörzeitmeilensteine aus dem importierten Verlauf. |
 
@@ -129,7 +129,7 @@ Punkt 63 bleibt für später vorgemerkt. Abgelehnte Funktionen bleiben ausgeschl
 | 72 | Sichere Upload-Verarbeitung | **Nachträglich bestätigt und angemessen umgesetzt, angepasst an den lokalen Import.** Keine Serveruploads oder Upload-Sitzungen. Dateitypprüfung, begrenzte ZIP-Verarbeitung, sichere Behandlung von Einträgen und Fehlern erfolgen im Browser; normale Spotify-Exporte sollen praktikabel bleiben. |
 | 73 | Import im Hintergrund mit Fortschritt | **Bestätigt und umgesetzt.** Browser-Worker verarbeitet den Import mit Fortschrittsanzeige, damit die Oberfläche bedienbar bleibt. |
 | 74 | Ergebnisse zwischenspeichern und indexieren | **Abgelehnt als zusätzliche Cache-/Index-Funktion.** Keine permanent gespeicherten Ergebnisse oder Indizes. Flüchtige normalisierte Laufzeitdaten und Aggregationen im Arbeitsspeicher für Filter und Anzeige sind notwendiger Bestandteil der aktuellen Browser-Auswertung. |
-| 75 | Solide Releases | **Bestätigt und umgesetzt.** Festgelegte Abhängigkeiten mit Lockfile, lokal ausgelieferte Assets, statischer Build, Docker-Konfiguration und vorbereitete GitHub-CI. 35 Tests waren vor der letzten reinen Farbanpassung bestanden; für diese Anpassung wurden auf Wunsch keine neuen Tests ausgeführt. Ein erfolgreicher CI-Lauf nach dem GitHub-Push ist erst nach dessen tatsächlichem Abschluss bestätigt. |
+| 75 | Solide Releases | **Bestätigt und umgesetzt.** Festgelegte Abhängigkeiten mit Lockfile, lokal ausgelieferte Assets, statischer Build, Docker-Konfiguration und GitHub-CI. Nach Entfernung der vergessenen Favoriten bestehen die 34 verbleibenden Tests. Ein erfolgreicher CI-Lauf nach einem GitHub-Push ist erst nach dessen tatsächlichem Abschluss bestätigt. |
 
 ## Abnahmekriterien für weitere Funktionen
 

@@ -9,15 +9,15 @@ Analyze Spotify Extended Streaming History entirely on your device. VerdeStats i
 - Music and podcast filters, automatic date coverage, year/month/custom periods and minimum listening seconds.
 - Hover/focus details for hour cells, calendar days and timeline bars: listening time, plays and top three tracks/artists.
 - Apostrophe/accent-tolerant search across titles, artists and albums; flexible word order, relevant global results and keyboard navigation.
-- Forgotten favourites and personal milestones, with current-period rankings.
+- Personal milestones, with current-period rankings.
 - Daily calendar, weekday/hour heatmap, daily/weekly/monthly/yearly charts, unique music counts and active-day averages.
 - Listening streaks, record days, inferred sessions, repeat-heavy days/weeks and top-5/top-10 concentration.
 - Skip/shuffle/offline ratios with explicit known-value coverage, device groups and country-code totals.
 - GitHub-inspired dark layout, compact top-seven widgets, English/German translation and in-session dashboard widget ordering.
 
-The approved first-stage scope is points 1–45 except the timezone selector and import diagnostic report. The timezone automatically follows your browser. Comebacks, first-in-import labels and prior-period comparisons were removed at the user’s request. Subsequent-year comparisons, recaps, image/PDF/CSV exports, profiles, permanent archives and Spotify API integration are outside this stage.
+The approved first-stage scope is points 1–45 except the timezone selector and import diagnostic report. The timezone automatically follows your browser. Forgotten favourites, comebacks, first-in-import labels and prior-period comparisons were removed at the user’s request. Subsequent-year comparisons, recaps, image/PDF/CSV exports, profiles, permanent archives and Spotify API integration are outside this stage.
 
-The complete original 75-point proposal, approved follow-up work and excluded features are recorded in [plan.md](plan.md). It reflects the later decisions to remove comparison labels and comebacks, keep all history in browser memory, and exclude Spotify integration.
+The complete original 75-point proposal, approved follow-up work and excluded features are recorded in [plan.md](plan.md). It reflects the later decisions to remove forgotten favourites, comparison labels and comebacks, keep all history in browser memory, and exclude Spotify integration.
 
 ## Run locally
 
@@ -66,7 +66,6 @@ Clearing the data releases application references, clears displayed results and 
 - Timestamp fields denote the **end** of a stream. Calendar, hourly and monthly buckets use that end time in your browser's local timezone, including local inclusive date boundaries.
 - Identities use Spotify URIs when available; fallbacks combine the title and artist (album identity also includes its artist). Different recordings with different URIs stay separate.
 - Deduplication removes identical normalized listening events across overlapping files. Repeated plays at different times remain.
-- Forgotten favourites need repeated previous listening and a long absence relative to the analysed period.
 - Sessions are an estimate: reconstructed starts (`end - played duration`) separated by at most 30 minutes are grouped. They do not establish your activity or location.
 - Boolean ratios exclude unknown values from the denominator and show coverage. No inference that every skipped track is disliked.
 - Album pages describe tracks present in your export, not the album's complete official track list. Country codes do not establish precise places or travel routes.

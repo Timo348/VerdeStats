@@ -169,17 +169,13 @@
     const selected = eligible.filter(entry => entry.time >= start && entry.time < end);
     const history = eligible.filter(entry => entry.time < end);
     const maps = mapsFor(selected), historyMaps = mapsFor(history);
-    const library = {}, forgotten = [], milestones = [];
+    const library = {}, milestones = [];
     for (const kind of Object.keys(maps)) {
       for (const entity of historyMaps[kind].values()) {
-        if (kind !== 'albums') {
-          const absent = Math.floor((end - 1 - entity.times[entity.times.length - 1]) / DAY);
-          if (entity.streams >= 10 && absent >= 90) forgotten.push(entityDTO(entity, { daysAbsent: absent }));
-          if (kind === 'songs') {
-            for (const threshold of [100, 500, 1000, 5000, 10000]) {
-              const hit = entity.times[threshold - 1];
-              if (hit !== undefined && hit >= start && hit < end) milestones.push({ id: entity.id, name: entity.name, artist: entity.artist, kind: 'song', streams: entity.streams, ms: entity.ms, threshold, unit: 'streams', label: `${threshold} plays`, reachedAt: new Date(hit).toISOString() });
-            }
+        if (kind === 'songs') {
+          for (const threshold of [100, 500, 1000, 5000, 10000]) {
+            const hit = entity.times[threshold - 1];
+            if (hit !== undefined && hit >= start && hit < end) milestones.push({ id: entity.id, name: entity.name, artist: entity.artist, kind: 'song', streams: entity.streams, ms: entity.ms, threshold, unit: 'streams', label: `${threshold} plays`, reachedAt: new Date(hit).toISOString() });
           }
         }
       }
@@ -233,7 +229,7 @@
     const sortBuckets = map => [...map.values()].sort((a, b) => b.ms - a.ms || a.name.localeCompare(b.name));
     Object.assign(totals, { uniqueSongs: maps.songs.size, uniqueArtists: maps.artists.size, activeDays: activeDates.length, calendarDays, avgMsPerDay: calendarDays ? Math.round(totals.ms / calendarDays) : 0, avgMsPerActiveDay: activeDates.length ? Math.round(totals.ms / activeDates.length) : 0, duration: formatDuration(totals.ms), durationString: durationString(totals.ms), avgMsPerStream: selected.length ? Math.round(totals.ms / selected.length) : 0, avgDurationString: durationString(selected.length ? totals.ms / selected.length : 0) });
     const concentration = count => totals.ms ? library.songs.slice(0, count).reduce((sum, entity) => sum + entity.ms, 0) / totals.ms * 100 : 0;
-    return { version: 2, fileCount, coverage: { start: coverageStart, end: coverageEnd }, dateRange: { start: dateKey(start), end: dateKey(end - 1), firstStream: selected.length ? new Date(selected[0].time).toISOString() : null, lastStream: selected.length ? new Date(selected[selected.length - 1].time).toISOString() : null }, type, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local', totals, library, daily, weekly, monthly, yearly, hours, weekdays, heatmap, heatmapDetails, insights: { topHour: Math.max(...hours) > 0 ? hours.indexOf(Math.max(...hours)) : null, topWeekday: Math.max(...weekdays) > 0 ? WEEKDAYS[weekdays.indexOf(Math.max(...weekdays))] : null, monthlyListening: monthly.map(row => ({ ...row, durationString: durationString(row.ms) })), platforms: sortBuckets(platforms), topPlatforms: sortBuckets(platforms).slice(0, 5), countries: sortBuckets(countries), streak, records: { timeDay: daily.length ? [...daily].sort((a, b) => b.ms - a.ms)[0] : null, varietyDay: daily.length ? [...daily].sort((a, b) => b.uniqueSongs - a.uniqueSongs || b.uniqueArtists - a.uniqueArtists || b.ms - a.ms)[0] : null }, sessions: sessionDTOs, repeats: [...repeatDays.values(), ...repeatWeeks.values()].filter(row => row.streams >= (row.period === 'day' ? 3 : 5)).sort((a, b) => b.streams - a.streams || b.ms - a.ms).slice(0, 100), concentration: { top5Percent: concentration(5), top10Percent: concentration(10) }, forgotten: forgotten.sort((a, b) => b.ms - a.ms).slice(0, 100), milestones: milestones.sort((a, b) => b.reachedAt.localeCompare(a.reachedAt)), skipSongs: library.songs.filter(entity => entity.skipCount > 0).sort((a, b) => b.skipCount - a.skipCount) } };
+    return { version: 2, fileCount, coverage: { start: coverageStart, end: coverageEnd }, dateRange: { start: dateKey(start), end: dateKey(end - 1), firstStream: selected.length ? new Date(selected[0].time).toISOString() : null, lastStream: selected.length ? new Date(selected[selected.length - 1].time).toISOString() : null }, type, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local', totals, library, daily, weekly, monthly, yearly, hours, weekdays, heatmap, heatmapDetails, insights: { topHour: Math.max(...hours) > 0 ? hours.indexOf(Math.max(...hours)) : null, topWeekday: Math.max(...weekdays) > 0 ? WEEKDAYS[weekdays.indexOf(Math.max(...weekdays))] : null, monthlyListening: monthly.map(row => ({ ...row, durationString: durationString(row.ms) })), platforms: sortBuckets(platforms), topPlatforms: sortBuckets(platforms).slice(0, 5), countries: sortBuckets(countries), streak, records: { timeDay: daily.length ? [...daily].sort((a, b) => b.ms - a.ms)[0] : null, varietyDay: daily.length ? [...daily].sort((a, b) => b.uniqueSongs - a.uniqueSongs || b.uniqueArtists - a.uniqueArtists || b.ms - a.ms)[0] : null }, sessions: sessionDTOs, repeats: [...repeatDays.values(), ...repeatWeeks.values()].filter(row => row.streams >= (row.period === 'day' ? 3 : 5)).sort((a, b) => b.streams - a.streams || b.ms - a.ms).slice(0, 100), concentration: { top5Percent: concentration(5), top10Percent: concentration(10) }, milestones: milestones.sort((a, b) => b.reachedAt.localeCompare(a.reachedAt)), skipSongs: library.songs.filter(entity => entity.skipCount > 0).sort((a, b) => b.skipCount - a.skipCount) } };
   }
   return { normalizeEntry, normalizeEntries, analyzeEntries, validateOptions, formatDuration, durationString, dateKey };
 });

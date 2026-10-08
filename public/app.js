@@ -15,8 +15,8 @@
   };
   const shortTime = ms => Number(ms || 0) >= 3600000 ? `${(ms/3600000).toLocaleString(i18n.locale,{maximumFractionDigits:1})} ${t('h')}` : duration(ms);
   const viewNames = {overview:'Overview',songs:'Songs',artists:'Artists',albums:'Albums',history:'History',listening:'Listening',data:'Data'};
-  const widgetNames = {timeline:'Listening timeline',songs:'Top songs',artists:'Top artists',forgotten:'Forgotten favourites',calendar:'Daily listening calendar',milestones:'Personal milestones',habits:'Listening at a glance'};
-  const state = {result:null,worker:null,request:0,pending:0,busy:false,view:'overview',page:1,sort:'ms',search:'',discovery:'all',granularity:'monthly',calendarYear:null,sessionPage:1,gap:30,detail:null,detailPage:1,files:[],widgets:Object.keys(widgetNames).map(id => ({id,enabled:true}))};
+  const widgetNames = {timeline:'Listening timeline',songs:'Top songs',artists:'Top artists',calendar:'Daily listening calendar',milestones:'Personal milestones',habits:'Listening at a glance'};
+  const state = {result:null,worker:null,request:0,pending:0,busy:false,view:'overview',page:1,sort:'ms',search:'',granularity:'monthly',calendarYear:null,sessionPage:1,gap:30,detail:null,detailPage:1,files:[],widgets:Object.keys(widgetNames).map(id => ({id,enabled:true}))};
   const content = $('view-content');
   const empty = label => `<div class="empty">${t(label || 'No listening data in this range.')}</div>`;
   const heading = (title,sub,extra='') => `<div class="section-heading"><div><h2>${t(title)}</h2>${sub ? `<p>${t(sub)}</p>` : ''}</div>${extra}</div>`;
@@ -26,7 +26,7 @@
   const sectionTitle = view => view === 'songs' ? songName() : view === 'artists' ? artistName() : viewNames[view];
   const entityButton = (entity,kind,body,className='') => `<button type="button" class="${className}" data-entity="${esc(entity.id)}" data-kind="${kind}">${body}</button>`;
   const badges = entity => entity.type==='podcast'?`<span class="badge neutral">${t('Podcast')}</span>`:'';
-  const lookup = (id,kind) => state.result?.library[kind]?.find(entity => entity.id === id) || (state.result?.insights.forgotten || []).find(entity => entity.id === id && (entity.kind==='artist'?'artists':'songs') === kind);
+  const lookup = (id,kind) => state.result?.library[kind]?.find(entity => entity.id === id);
   const localDateKey = value => {
     const day = new Date(value);
     return `${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`;
@@ -97,10 +97,6 @@
     const max = Math.max(...items.slice(0,limit).map(row=>row.ms));
     return `<div class="rank-list">${items.slice(0,limit).map((entity,index)=>entityButton(entity,kind,`<span class="rank-number">${String(index+1).padStart(2,'0')}</span><span class="rank-main"><strong>${esc(entity.name)}</strong><small>${esc(entity.artist || `${num(entity.streams)} ${t('plays')}`)}</small><span class="progress-track"><span class="progress-fill" style="width:${max?entity.ms/max*100:0}%"></span></span></span><span class="rank-value">${shortTime(entity.ms)}</span>`,'rank-item')).join('')}</div>`;
   }
-  function discovery(items) {
-    if (!items?.length) return empty('No forgotten favourites found.');
-    return `<div class="discovery-list">${items.slice(0,7).map(entity=>entityButton(entity,entity.kind==='artist'?'artists':'songs',`<span class="discovery-symbol" aria-hidden="true">♫</span><span><strong>${esc(entity.name)}</strong><small>${entity.artist?`${esc(entity.artist)} · `:''}${t('Last heard')} ${date(entity.lastStream)}</small></span><span>${t(entity.kind==='artist'?artistName():songName())} ↗</span>`,'discovery-item')).join('')}</div>`;
-  }
   function calendar(year) {
     const data = state.result.daily || [];
     if (!state.result.coverage?.start) return empty();
@@ -138,7 +134,6 @@
       timeline:()=>`<section class="panel wide">${heading('Listening timeline','',`<button type="button" class="text-button" data-go="history">${t('Explore history')} →</button>`)}${chart(result.monthly)}</section>`,
       songs:()=>`<section class="panel">${heading(result.type==='podcast'?'Top episodes':'Top songs','',`<button type="button" class="text-button" data-go="songs">${t('View all')} →</button>`)}${rankList(result.library.songs,'songs')}</section>`,
       artists:()=>`<section class="panel">${heading(result.type==='podcast'?'Top shows':'Top artists','',`<button type="button" class="text-button" data-go="artists">${t('View all')} →</button>`)}${rankList(result.library.artists,'artists')}</section>`,
-      forgotten:()=>`<section class="panel">${heading('Forgotten favourites','Played at least 10 times, unheard for 90 days.')}${discovery(insights.forgotten)}<p class="panel-note">${t('Measured at the end of your selected range, using only imported history.')}</p></section>`,
       calendar:()=>`<section class="panel wide">${heading('Daily listening calendar','',calendarSelect())}${calendar(state.calendarYear)}</section>`,
       milestones:()=>`<section class="panel wide">${heading('Personal milestones','Thresholds reached inside the selected range.')}${milestones(insights.milestones)}</section>`,
       habits:()=>`<section class="panel">${heading('Listening at a glance')}
@@ -148,16 +143,16 @@
   }
   function library() {
     const kind=state.view;
-    const all=state.discovery==='forgotten' ? (state.result.insights.forgotten||[]).filter(entity=>entity.kind===(kind==='artists'?'artist':'song')) : state.result.library[kind]||[];
+    const all=state.result.library[kind]||[];
     const query=VerdeSearch.compile(state.search);
     const items=all.filter(entity=>VerdeSearch.score(entity,query)>0).slice();
     items.sort((a,b)=>state.sort==='name'?a.name.localeCompare(b.name,i18n.locale):state.sort==='streams'?b.streams-a.streams||b.ms-a.ms:b.ms-a.ms||b.streams-a.streams);
     const pages=Math.max(1,Math.ceil(items.length/20));state.page=Math.min(state.page,pages);
     const rows=items.slice((state.page-1)*20,state.page*20);
     return `<section class="panel">${heading(sectionTitle(kind), 'Complete rankings for your selected range.')}
-      <div class="library-controls"><label class="sr-only" for="library-search">${t('Search this list')}</label><input type="search" id="library-search" value="${esc(state.search)}" placeholder="${t('Search this list')}" autocomplete="off"><div class="library-selects">${kind!=='albums'?`<label class="sr-only" for="discovery-filter">${t('List contents')}</label><select id="discovery-filter"><option value="all" ${state.discovery==='all'?'selected':''}>${t('All entries')}</option><option value="forgotten" ${state.discovery==='forgotten'?'selected':''}>${t('Forgotten favourites')}</option></select>`:''}<label class="sr-only" for="library-sort">${t('Sort by')}</label><select id="library-sort"><option value="ms" ${state.sort==='ms'?'selected':''}>${t('Most listening time')}</option><option value="streams" ${state.sort==='streams'?'selected':''}>${t('Most plays')}</option><option value="name" ${state.sort==='name'?'selected':''}>${t('Name A–Z')}</option></select></div></div>
+      <div class="library-controls"><label class="sr-only" for="library-search">${t('Search this list')}</label><input type="search" id="library-search" value="${esc(state.search)}" placeholder="${t('Search this list')}" autocomplete="off"><div class="library-selects"><label class="sr-only" for="library-sort">${t('Sort by')}</label><select id="library-sort"><option value="ms" ${state.sort==='ms'?'selected':''}>${t('Most listening time')}</option><option value="streams" ${state.sort==='streams'?'selected':''}>${t('Most plays')}</option><option value="name" ${state.sort==='name'?'selected':''}>${t('Name A–Z')}</option></select></div></div>
       ${rows.length?`<div class="table-scroll"><table class="data-table"><thead><tr><th>${t('Rank')}</th><th>${t(kind==='songs'?'Track':kind==='artists'?'Artist':'Album')}</th><th>${t('Listening time')}</th><th>${t('Plays')}</th></tr></thead><tbody>${rows.map((entity,index)=>`<tr><td class="number">${num((state.page-1)*20+index+1)}</td><td class="entity-cell">${entityButton(entity,kind,`<strong>${esc(entity.name)}</strong>${entity.artist?`<small>${esc(entity.artist)}</small>`:''}`,'entity-button')}${badges(entity)?`<div class="entity-badges">${badges(entity)}</div>`:''}</td><td class="number">${shortTime(entity.ms)}</td><td class="number">${num(entity.streams)}</td></tr>`).join('')}</tbody></table></div>`:empty('No matches found.')}
-      ${pagination(state.page,pages,items.length,'library')}<p class="sort-note">${t(state.discovery==='forgotten'?'Forgotten favourites show historical totals up to the end of your selected range.':'Search ignores punctuation and accents; words can be in any order.')}</p>${kind==='albums'?`<p class="panel-note">${t('Album details include only tracks present in your files, not a complete album tracklist.')}</p>`:''}</section>`;
+      ${pagination(state.page,pages,items.length,'library')}<p class="sort-note">${t('Search ignores punctuation and accents; words can be in any order.')}</p>${kind==='albums'?`<p class="panel-note">${t('Album details include only tracks present in your files, not a complete album tracklist.')}</p>`:''}</section>`;
   }
   function pagination(page,pages,count,type) {
     return `<div class="pagination"><span>${num(count)} ${t('results')} · ${t('Page')} ${num(page)} / ${num(pages)}</span><div><button type="button" class="button secondary" data-page="${type}" data-step="-1" ${page<=1?'disabled':''}>← ${t('Previous')}</button><button type="button" class="button secondary" data-page="${type}" data-step="1" ${page>=pages?'disabled':''}>${t('Next')} →</button></div></div>`;
@@ -241,7 +236,7 @@
     $('timezone-caption').textContent=`${t('End date included')} · ${timezone}`;
   }
   function navigate(view) {
-    state.view=view;state.page=1;state.search='';state.discovery='all';render();
+    state.view=view;state.page=1;state.search='';render();
     $('global-search').value='';$('search-results').hidden=true;
   }
   function relatedTracks(items) {
@@ -253,13 +248,12 @@
     if(!entity)return;
     if(!state.detail||state.detail.id!==id||state.detail.kind!==kind)state.detailPage=1;state.detail={id,kind};
     const result=state.result;
-    const inSelection=!!result.library[kind].find(item=>item.id===entity.id);
     $('detail-kind').textContent=t(kind==='songs'?(entity.type==='podcast'?'Episode':'Song'):kind==='artists'?(entity.type==='podcast'?'Show':'Artist'):'Album');
     const songs=kind==='songs'?[]:result.library.songs.filter(song=>kind==='artists'?(entity.songIds?.includes(song.id)||song.artistId===entity.id):(entity.songIds?.includes(song.id)||song.albumId===entity.id));
     const albums=kind==='artists'?result.library.albums.filter(album=>entity.albumIds?.includes(album.id)||album.artistId===entity.id):[];
     const artist=kind==='songs'?lookup(entity.artistId,'artists'):null,album=kind==='songs'?lookup(entity.albumId,'albums'):null;
     const entityMilestones=(result.insights.milestones||[]).filter(item=>item.id===entity.id);
-    $('detail-content').innerHTML=`<h2>${esc(entity.name)}</h2><p class="detail-subtitle">${esc(entity.artist||t(kind==='artists'?'Artist profile':'Listening details'))}</p>${badges(entity)?`<div class="entity-badges">${badges(entity)}</div>`:''}<div class="stats-grid">${card('Listening time',duration(entity.ms))}${card('Plays',num(entity.streams))}${card('Listening-time rank',entity.rank?`#${num(entity.rank)}`:'—')}</div><div class="key-values"><div class="key-value"><small>${t('First listen')}</small><strong>${date(entity.firstStream)}</strong></div><div class="key-value"><small>${t('Latest listen')}</small><strong>${date(entity.lastStream)}</strong></div></div><p class="detail-context">${t(inSelection?'Listening time and plays follow your active filters. First and last appearances come from your imported history.':'These totals cover imported history up to the selected end date; this favourite has no recent plays.')}</p><div class="detail-section key-values"><div class="key-value"><small>${t('Active months')}</small><strong>${num(entity.monthly?.filter(month=>month.ms>0).length)}</strong></div>${inSelection?`<div class="key-value"><small>${t('Share of listening time')}</small><strong>${pct(result.totals.ms?entity.ms/result.totals.ms*100:0)}</strong></div>`:''}</div>${artist||album?`<div class="detail-links">${artist?entityButton(artist,'artists',`${t('Artist')}: ${esc(artist.name)} ↗`,'button secondary'):''}${album?entityButton(album,'albums',`${t('Album')}: ${esc(album.name)} ↗`,'button secondary'):''}</div>`:''}<section class="detail-section"><h3>${t('Listening timeline')}</h3>${chart(entity.monthly,'monthly',false)}</section>${kind!=='songs'?`<section class="detail-section"><h3>${t(kind==='albums'?'Heard tracks':'Favourite tracks')} · ${num(songs.length)}</h3>${relatedTracks(songs.sort((a,b)=>b.ms-a.ms))}${kind==='albums'?`<p class="panel-note">${t('These are only the tracks heard in this range. The export cannot tell us the full album tracklist or unplayed tracks.')}</p>`:''}</section>`:''}${albums.length?`<section class="detail-section"><h3>${t('Albums')} · ${num(albums.length)}</h3>${rankList(albums.sort((a,b)=>b.ms-a.ms),'albums',albums.length)}</section>`:''}${entityMilestones.length?`<section class="detail-section"><h3>${t('Personal milestones')}</h3>${milestones(entityMilestones)}</section>`:''}${entity.skipKnown?`<p class="panel-note">${t('Skip rate')}: ${pct(entity.skipCount/entity.skipKnown*100)} · ${num(entity.skipCount)} / ${num(entity.skipKnown)} ${t('known plays')}</p>`:''}`;
+    $('detail-content').innerHTML=`<h2>${esc(entity.name)}</h2><p class="detail-subtitle">${esc(entity.artist||t(kind==='artists'?'Artist profile':'Listening details'))}</p>${badges(entity)?`<div class="entity-badges">${badges(entity)}</div>`:''}<div class="stats-grid">${card('Listening time',duration(entity.ms))}${card('Plays',num(entity.streams))}${card('Listening-time rank',entity.rank?`#${num(entity.rank)}`:'—')}</div><div class="key-values"><div class="key-value"><small>${t('First listen')}</small><strong>${date(entity.firstStream)}</strong></div><div class="key-value"><small>${t('Latest listen')}</small><strong>${date(entity.lastStream)}</strong></div></div><p class="detail-context">${t('Listening time and plays follow your active filters. First and last appearances come from your imported history.')}</p><div class="detail-section key-values"><div class="key-value"><small>${t('Active months')}</small><strong>${num(entity.monthly?.filter(month=>month.ms>0).length)}</strong></div><div class="key-value"><small>${t('Share of listening time')}</small><strong>${pct(result.totals.ms?entity.ms/result.totals.ms*100:0)}</strong></div></div>${artist||album?`<div class="detail-links">${artist?entityButton(artist,'artists',`${t('Artist')}: ${esc(artist.name)} ↗`,'button secondary'):''}${album?entityButton(album,'albums',`${t('Album')}: ${esc(album.name)} ↗`,'button secondary'):''}</div>`:''}<section class="detail-section"><h3>${t('Listening timeline')}</h3>${chart(entity.monthly,'monthly',false)}</section>${kind!=='songs'?`<section class="detail-section"><h3>${t(kind==='albums'?'Heard tracks':'Favourite tracks')} · ${num(songs.length)}</h3>${relatedTracks(songs.sort((a,b)=>b.ms-a.ms))}${kind==='albums'?`<p class="panel-note">${t('These are only the tracks heard in this range. The export cannot tell us the full album tracklist or unplayed tracks.')}</p>`:''}</section>`:''}${albums.length?`<section class="detail-section"><h3>${t('Albums')} · ${num(albums.length)}</h3>${rankList(albums.sort((a,b)=>b.ms-a.ms),'albums',albums.length)}</section>`:''}${entityMilestones.length?`<section class="detail-section"><h3>${t('Personal milestones')}</h3>${milestones(entityMilestones)}</section>`:''}${entity.skipKnown?`<p class="panel-note">${t('Skip rate')}: ${pct(entity.skipCount/entity.skipKnown*100)} · ${num(entity.skipCount)} / ${num(entity.skipKnown)} ${t('known plays')}</p>`:''}`;
     const dialog=$('detail-dialog');if(!dialog.open)dialog.showModal();dialog.setAttribute('aria-label',`${t('Listening details')}: ${entity.name}`);
   }
   function widgetSettings() {
@@ -394,7 +388,6 @@
     if(event.target.dataset.widget){state.widgets.find(widget=>widget.id===event.target.dataset.widget).enabled=event.target.checked;render();}
     if(event.target.id==='calendar-year'){state.calendarYear=Number(event.target.value);render();}
     if(event.target.id==='library-sort'){state.sort=event.target.value;state.page=1;render();}
-    if(event.target.id==='discovery-filter'){state.discovery=event.target.value;state.page=1;render();}
   });
   function updateLibrarySearch(event) {
     if(event.target.id==='library-search'&&!event.isComposing&&state.search!==event.target.value){
