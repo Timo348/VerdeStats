@@ -1,0 +1,50 @@
+:root {
+  --border-strong: #484f58;
+  --primary: #238636;
+  --primary-hover: #2ea043;
+  --chart-hover: #56d364;
+  --selected: #0e261b;
+  --heat-1: #0e4429;
+  --heat-2: #006d32;
+  --heat-3: #26a641;
+  --heat-4: #39d353;
+}
+.appearance-controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.landing-header>.appearance-controls { margin-left:auto; flex-shrink:0; }
+.theme-switch,.language-switch { display:inline-flex; gap:3px; padding:3px; border:1px solid var(--border); border-radius:8px; align-self:auto; }
+.theme-switch button,.language-switch button { min-height:36px; padding:6px 10px; border-radius:5px; background:transparent; color:var(--muted); font-size:12px; font-weight:600; }
+.theme-switch button[aria-pressed=true],.language-switch button[aria-pressed=true] { color:var(--accent); background:var(--selected); }
+.theme-switch button:hover,.language-switch button:hover { background:var(--raised); }
+/* The original palette, solid green controls and green-edged statistic cards. */
+:root[data-theme=legacy] {
+  --bg:#050505; --sidebar:#080808; --panel:#0c0c0c; --raised:#1a1a1a;
+  --border:#2a2a2a; --border-strong:#484848; --text:#f0f0f0;
+  --muted:#b3b3b3; --dim:#a0a0a0; --accent:#00ff77; --strong:#00cc70;
+  --primary:#00cc70; --primary-hover:#33db8b; --chart-hover:#33ff99;
+  --ink:#001b0d; --selected:#103320; --red:#ff8f88; --amber:#f0c75e;
+  --heat-1:#103b23; --heat-2:#087a3b; --heat-3:#00b85a; --heat-4:#00ff77;
+  --font:system-ui,-apple-system,Segoe UI,sans-serif;
+}
+[data-theme=legacy] .brand { font-weight:800; text-transform:uppercase; letter-spacing:-.06em; }
+[data-theme=legacy] .brand img { background:var(--accent); border-radius:9px; padding:3px; }
+[data-theme=legacy] .primary { color:#00150a; font-weight:800; border-color:var(--chart-hover); }
+[data-theme=legacy] .primary:hover { border-color:var(--accent); }
+[data-theme=legacy] :is(.panel,.stat-card,.detail-dialog,.settings-dialog,.navigation-dialog) { border-radius:12px; }
+[data-theme=legacy] .stat-card { border-left:3px solid var(--strong); }
+[data-theme=legacy] .stat-value { font-weight:750; letter-spacing:-.04em; }
+[data-theme=legacy] :is(.eyebrow,.sidebar-label,.filter-bar label>span,.explore-form legend) { color:var(--chart-hover); font-weight:700; }
+[data-theme=legacy] .sidebar { border-right-color:var(--border); }
+[data-theme=legacy] .app-nav button.active { box-shadow:inset 0 0 0 1px #22613c; }
+[data-theme=legacy] :is(input,select,.drop-zone,.metric-block,.milestone,.detail-dialog .stat-card) { background:#141414; }
+[data-theme=legacy] :is(input,select):focus-visible { background:var(--raised); border-color:var(--accent); }
+[data-theme=legacy] .drop-zone { border-width:2px; }
+[data-theme=legacy] .drop-zone:hover,[data-theme=legacy] .drop-zone.dragover { background:var(--selected); }
+[data-theme=legacy] :is(.progress-track,.progress-fill) { border-radius:999px; }
+[data-theme=legacy] .chart-bar { border-radius:5px 5px 0 0; }
+[data-theme=legacy] .rank-number { color:var(--accent); font-family:ui-monospace,monospace; }
+[data-theme=legacy] :is(.badge,.segmented button.active) { background:var(--selected); color:var(--chart-hover); }
+[data-theme=legacy] .badge.neutral { background:var(--raised); color:var(--muted); }
+[data-theme=legacy] dialog::backdrop { background:rgba(0,0,0,.8); }
+[data-theme=legacy] .tutorial { border-left:3px solid var(--strong); }
+[data-theme=legacy] .landing-intro h1 { font-weight:750; }
+[data-theme=legacy] :is(.table-scroll,.chart-scroll,.calendar-scroll,.heatmap-scroll,.explore-table-wrap,.sidebar,.navigation-dialog) { scrollbar-color:#295a3b #0c0c0c; }

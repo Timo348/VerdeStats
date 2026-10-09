@@ -2,8 +2,9 @@
 <div class="app-shell" id="app" hidden>
   <aside class="sidebar">
     <a href="/" class="brand"><img src="/favicon.svg" alt="" width="32" height="32"><span>Verde<span class="brand-accent">Stats</span></span></a>
+    <button type="button" id="menu-toggle" class="button secondary mobile-menu-button" aria-haspopup="dialog" aria-controls="navigation-dialog" aria-expanded="false"><span aria-hidden="true">☰</span><span data-i18n="Menu">Menu</span></button>
     <span class="sidebar-label" data-i18n="YOUR LIBRARY">YOUR LIBRARY</span>
-    <nav class="app-nav" aria-label="Main navigation" data-i18n-aria="Main navigation">
+    <div id="desktop-navigation-slot"><nav class="app-nav" aria-label="Main navigation" data-i18n-aria="Main navigation">
       <button type="button" data-view="overview" class="active"><span class="nav-icon" aria-hidden="true">▦</span><span data-i18n="Overview">Overview</span></button>
       <button type="button" data-view="songs"><span class="nav-icon" aria-hidden="true">♫</span><span data-i18n="Songs">Songs</span></button>
       <button type="button" data-view="artists"><span class="nav-icon" aria-hidden="true">♬</span><span data-i18n="Artists">Artists</span></button>
@@ -11,12 +12,17 @@
       <span class="nav-divider"></span>
       <button type="button" data-view="history"><span class="nav-icon" aria-hidden="true">▥</span><span data-i18n="History">History</span></button>
       <button type="button" data-view="listening"><span class="nav-icon" aria-hidden="true">◷</span><span data-i18n="Listening">Listening</span></button>
+      <button type="button" data-view="compare"><span class="nav-icon" aria-hidden="true">⇄</span><span data-i18n="Comparisons">Comparisons</span></button>
+      <button type="button" data-view="discoveries"><span class="nav-icon" aria-hidden="true">◇</span><span data-i18n="Discoveries">Discoveries</span></button>
+      <button type="button" data-view="recaps"><span class="nav-icon" aria-hidden="true">▤</span><span data-i18n="Recaps">Recaps</span></button>
+      <button type="button" data-view="exports"><span class="nav-icon" aria-hidden="true">↓</span><span data-i18n="Exports">Exports</span></button>
       <button type="button" data-view="data"><span class="nav-icon" aria-hidden="true">⇧</span><span data-i18n="Data">Data</span></button>
-    </nav>
-    <div class="sidebar-bottom"><div class="session-indicator"><span class="status-dot"></span><span data-i18n="Browser only">Browser only</span></div><button type="button" class="button secondary full-width" data-discard data-i18n="Discard data">Discard data</button><div class="language-switch" role="group" aria-label="Language / Sprache"><button type="button" data-language="en" aria-pressed="true">EN</button><button type="button" data-language="de" aria-pressed="false">DE</button></div><span class="language-hint" data-i18n="Language is saved in this browser.">Language is saved in this browser.</span><span class="timezone-note" id="timezone-note"></span></div>
+    </nav></div>
+    <div class="sidebar-bottom"><div class="session-indicator"><span class="status-dot"></span><span data-i18n="Browser only">Browser only</span></div><button type="button" class="button secondary full-width" data-discard data-i18n="Discard data">Discard data</button><%- include('partials/preferences') %><span class="language-hint" data-i18n="Language and theme are saved in this browser.">Language and theme are saved in this browser.</span><span class="timezone-note" id="timezone-note"></span></div>
   </aside>
   <div class="app-main">
     <header class="app-header"><div><span class="eyebrow" data-i18n="LISTENING STATISTICS">LISTENING STATISTICS</span><h1 id="view-title" data-i18n="Overview">Overview</h1></div><div class="global-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="19" height="19" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><label for="global-search" class="sr-only" data-i18n="Search songs, artists and albums">Search songs, artists and albums</label><input id="global-search" type="search" autocomplete="off" placeholder="Search your music…" data-i18n-placeholder="Search your music…"><div id="search-results" class="search-results" hidden></div></div></header>
+    <details id="filter-disclosure" class="filter-disclosure" open><summary><span data-i18n="Filters">Filters</span><span class="filter-chevron" aria-hidden="true">⌄</span></summary>
     <form id="filter-form" class="filter-bar">
       <label><span data-i18n="Period">Period</span><select id="period"><option value="all" data-i18n="All imported history">All imported history</option><option value="year" data-i18n="Year">Year</option><option value="month" data-i18n="Month">Month</option><option value="custom" data-i18n="Custom dates">Custom dates</option></select></label>
       <label id="year-field" hidden><span data-i18n="Year">Year</span><select id="period-year"></select></label><label id="month-field" hidden><span data-i18n="Month">Month</span><input id="period-month" type="month"></label>
@@ -24,7 +30,7 @@
       <label><span data-i18n="Content">Content</span><select id="content-type"><option value="music" data-i18n="Music">Music</option><option value="podcast" data-i18n="Podcasts">Podcasts</option><option value="all" data-i18n="Music + podcasts">Music + podcasts</option></select></label>
       <label><span data-i18n="Minimum seconds">Minimum seconds</span><input type="number" id="min-seconds" value="0" min="0" max="86400" step="1" list="minimum-options"><datalist id="minimum-options"><option value="0"><option value="10"><option value="30"><option value="60"></datalist></label>
       <button type="submit" id="analyze-btn" class="button primary" data-i18n="Apply">Apply</button>
-    </form>
+    </form></details>
     <div class="range-caption"><span id="range-summary"></span><span id="timezone-caption"></span></div>
     <div id="job-progress" class="progress-box" hidden><div class="progress-meta"><span id="job-stage" data-i18n="Analyzing your history…">Analyzing your history…</span><span id="job-percent"></span></div><progress id="job-bar" max="100" value="0" aria-label="Analysis progress" data-i18n-aria="Analysis progress"></progress></div>
     <div id="app-status" class="status" role="status" aria-live="polite"></div>
@@ -34,3 +40,5 @@
 </div>
 <dialog id="detail-dialog" class="detail-dialog"><div class="dialog-top"><span class="eyebrow" id="detail-kind"></span><button type="button" class="icon-button" data-close="detail-dialog" aria-label="Close" data-i18n-aria="Close">×</button></div><div id="detail-content"></div></dialog>
 <dialog id="widgets-dialog" class="settings-dialog"><div class="dialog-top"><h2 data-i18n="Customize overview">Customize overview</h2><button type="button" class="icon-button" data-close="widgets-dialog" aria-label="Close" data-i18n-aria="Close">×</button></div><p class="muted" data-i18n="Choose and reorder widgets. This layout is kept only while this page is open.">Choose and reorder widgets. This layout is kept only while this page is open.</p><div id="widget-settings"></div><button id="widgets-done" type="button" class="button primary" data-i18n="Done">Done</button></dialog>
+
+<dialog id="navigation-dialog" class="navigation-dialog" aria-labelledby="navigation-title"><div class="dialog-top"><h2 id="navigation-title" data-i18n="Navigation">Navigation</h2><button type="button" class="icon-button" data-close="navigation-dialog" aria-label="Close" data-i18n-aria="Close">×</button></div><div id="mobile-navigation-slot"></div><button type="button" class="button secondary full-width" data-discard data-i18n="Discard data">Discard data</button></dialog>

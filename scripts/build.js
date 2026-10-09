@@ -13,6 +13,17 @@ async function build(outputDirectory=path.join(root,'dist')) {
   await fs.copyFile(path.join(root,'node_modules/fflate/LICENSE'),path.join(resolved,'vendor/fflate.LICENSE.txt'));
   const html=await ejs.renderFile(path.join(root,'views/index.ejs'),{title:'VerdeStats'});
   await fs.writeFile(path.join(resolved,'index.html'),html);
+  // Source files may be root-only on a production checkout. Published static
+  // assets must be readable by the unprivileged Nginx user after COPY.
+  async function publishPermissions(directory) {
+    await fs.chmod(directory, 0o755);
+    for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+      const full = path.join(directory, entry.name);
+      if (entry.isDirectory()) await publishPermissions(full);
+      else await fs.chmod(full, 0o644);
+    }
+  }
+  await publishPermissions(resolved);
   console.log('Built static browser application in dist/');
   return resolved;
 }

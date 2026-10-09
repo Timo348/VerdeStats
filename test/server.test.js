@@ -3,7 +3,13 @@ const assert=require('node:assert/strict');
 const {createServer}=require('../server');
 const {build}=require('../scripts/build');
 test('static app rejects uploads, protects browser data and uses only local assets',async t=>{
-  await build();
+  const output=await build();
+  const fs=require('node:fs/promises'),path=require('node:path');
+  for(const asset of ['index.html','app.js','worker.js','explorations.js','exploration-ui.js','exports.js','vendor/fflate.js']) {
+    assert.equal((await fs.stat(path.join(output,asset))).mode&0o777,0o644,'Published asset must be readable by Nginx: '+asset);
+  }
+  assert.equal((await fs.stat(output)).mode&0o777,0o755);
+  assert.equal((await fs.stat(path.join(output,'vendor'))).mode&0o777,0o755);
   const server=createServer().listen(0,'127.0.0.1');
   await new Promise(resolve=>server.once('listening',resolve));
   t.after(()=>new Promise(resolve=>server.close(resolve)));

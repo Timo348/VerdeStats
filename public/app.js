@@ -14,13 +14,14 @@
     return `${seconds} ${t('s')}`;
   };
   const shortTime = ms => Number(ms || 0) >= 3600000 ? `${(ms/3600000).toLocaleString(i18n.locale,{maximumFractionDigits:1})} ${t('h')}` : duration(ms);
-  const viewNames = {overview:'Overview',songs:'Songs',artists:'Artists',albums:'Albums',history:'History',listening:'Listening',data:'Data'};
+  const viewNames = {overview:'Overview',songs:'Songs',artists:'Artists',albums:'Albums',history:'History',listening:'Listening',compare:'Comparisons',discoveries:'Discoveries',recaps:'Recaps',exports:'Exports',data:'Data'};
   const widgetNames = {timeline:'Listening timeline',songs:'Top songs',artists:'Top artists',calendar:'Daily listening calendar',milestones:'Personal milestones',habits:'Listening at a glance'};
   const state = {result:null,worker:null,request:0,pending:0,busy:false,view:'overview',page:1,sort:'ms',search:'',granularity:'monthly',calendarYear:null,sessionPage:1,gap:30,detail:null,detailPage:1,files:[],widgets:Object.keys(widgetNames).map(id => ({id,enabled:true}))};
   const content = $('view-content');
   const empty = label => `<div class="empty">${t(label || 'No listening data in this range.')}</div>`;
   const heading = (title,sub,extra='') => `<div class="section-heading"><div><h2>${t(title)}</h2>${sub ? `<p>${t(sub)}</p>` : ''}</div>${extra}</div>`;
   const card = (label,value,note='',accent=false) => `<div class="stat-card"><div class="stat-label">${t(label)}</div><div class="stat-value${accent?' accent':''}">${value}</div>${note?`<div class="stat-note">${note}</div>`:''}</div>`;
+  const explorationUI=window.createExplorationUI({state,t,esc,num,pct,duration,date,card,heading,empty});
   const songName = () => state.result?.type === 'podcast' ? 'Episodes' : 'Songs';
   const artistName = () => state.result?.type === 'podcast' ? 'Shows' : 'Artists';
   const sectionTitle = view => view === 'songs' ? songName() : view === 'artists' ? artistName() : viewNames[view];
@@ -218,7 +219,7 @@
   }
   function dataView() {
     const result=state.result;
-    return `<section class="panel data-summary">${heading('This browser session','No server upload. No saved listening archive.')}<div class="key-values"><div class="key-value"><small>${t('History files')}</small><strong>${num(result.fileCount)}</strong></div><div class="key-value"><small>${t('Imported coverage')}</small><strong>${date(result.coverage?.start)} – ${date(result.coverage?.end)}</strong></div><div class="key-value"><small>${t('Current content filter')}</small><strong>${t(result.type==='music'?'Music':result.type==='podcast'?'Podcasts':'Music + podcasts')}</strong></div><div class="key-value"><small>${t('Timezone')}</small><strong>${esc(result.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone)}</strong></div></div><div class="info-line"><span class="info-icon" aria-hidden="true">◇</span><p>${t('Your history is processed only in this browser. It is not sent to VerdeStats, Spotify or another service.')}</p></div><div class="info-line"><span class="info-icon" aria-hidden="true">↻</span><p>${t('Your data stays in memory while this page is open. Refreshing, closing the page or discarding data resets the analysis.')}</p></div><div class="info-line"><span class="info-icon" aria-hidden="true">▦</span><p>${t('Only your chosen language is remembered in this browser. Widget layouts are temporary, and listening data is never saved in browser storage.')}</p></div><div class="info-line"><span class="info-icon" aria-hidden="true">♫</span><p>${t('Milestones refer only to your imported files. They do not describe your complete lifetime if the export is incomplete.')}</p></div><button type="button" class="button secondary" data-discard>${t('Discard data and choose new files')}</button></section>`;
+    return `<section class="panel data-summary">${heading('This browser session','No server upload. No saved listening archive.')}<div class="key-values"><div class="key-value"><small>${t('History files')}</small><strong>${num(result.fileCount)}</strong></div><div class="key-value"><small>${t('Imported coverage')}</small><strong>${date(result.coverage?.start)} – ${date(result.coverage?.end)}</strong></div><div class="key-value"><small>${t('Current content filter')}</small><strong>${t(result.type==='music'?'Music':result.type==='podcast'?'Podcasts':'Music + podcasts')}</strong></div><div class="key-value"><small>${t('Timezone')}</small><strong>${esc(result.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone)}</strong></div></div><div class="info-line"><span class="info-icon" aria-hidden="true">◇</span><p>${t('Your history is processed only in this browser. It is not sent to VerdeStats, Spotify or another service.')}</p></div><div class="info-line"><span class="info-icon" aria-hidden="true">↻</span><p>${t('Your data stays in memory while this page is open. Refreshing, closing the page or discarding data resets the analysis.')}</p></div><div class="info-line"><span class="info-icon" aria-hidden="true">▦</span><p>${t('Only your chosen language and theme are remembered in this browser. Widget layouts are temporary, and listening data is never saved in browser storage.')}</p></div><div class="info-line"><span class="info-icon" aria-hidden="true">♫</span><p>${t('Milestones refer only to your imported files. They do not describe your complete lifetime if the export is incomplete.')}</p></div><button type="button" class="button secondary" data-discard>${t('Discard data and choose new files')}</button></section>`;
   }
   function render() {
     if(!state.result)return;
@@ -228,7 +229,7 @@
       const active=button.dataset.view===state.view;button.classList.toggle('active',active);button.setAttribute('aria-current',active?'page':'false');
       const label=button.querySelector('[data-i18n]');label.textContent=t(sectionTitle(button.dataset.view));label.dataset.i18n=sectionTitle(button.dataset.view);
     });
-    content.innerHTML=state.view==='overview'?overview():['songs','artists','albums'].includes(state.view)?library():state.view==='history'?history():state.view==='listening'?listening():dataView();
+    content.innerHTML=Object.hasOwn(explorationUI.names,state.view)?explorationUI.render(state.view):state.view==='overview'?overview():['songs','artists','albums'].includes(state.view)?library():state.view==='history'?history():state.view==='listening'?listening():dataView();
     const range=state.result.dateRange;
     $('range-summary').textContent=`${date(range.start)} – ${date(range.end)} · ${num(state.result.totals.streams)} ${t('plays')}`;
     const timezone=state.result.timezone||Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -237,6 +238,7 @@
   }
   function navigate(view) {
     state.view=view;state.page=1;state.search='';render();
+    if(['compare','discoveries','recaps'].includes(view)&&state.exploration?.view!==view&&!state.busy)explore();
     $('global-search').value='';$('search-results').hidden=true;
   }
   function relatedTracks(items) {
@@ -285,7 +287,11 @@
       const importing=!state.result;
       if(message.type==='progress'){setProgress(message.progress,message.stage,importing);return;}
       if(message.type==='error'){fail(message.error||'Analysis failed',importing);return;}
+      if(message.type==='exploration'){
+        state.exploration={...message.result,view:state.requestedExploreView,recapTitle:state.requestedRecapName,recapMode:state.requestedRecapMode};state.busy=false;$('job-progress').hidden=true;$('analyze-btn').disabled=false;$('app-status').textContent='';render();if(['compare','discoveries','recaps'].includes(state.view)&&state.view!==state.requestedExploreView)explore();return;
+      }
       if(message.type==='result'){
+        state.exploration=null;state.appliedMinMs=importing?0:state.requestedMinMs;
         state.result=message.result;state.busy=false;state.page=1;state.sessionPage=1;
         $('landing').hidden=true;$('app').hidden=false;
         $('upload-progress').hidden=true;$('job-progress').hidden=true;
@@ -305,6 +311,15 @@
     const status=$(importing?'upload-status':'app-status');status.className='status error';status.textContent=t(message);
     $('upload-btn').disabled=!state.files.length;$('analyze-btn').disabled=false;
     $('upload-progress').hidden=true;$('job-progress').hidden=true;
+    if(!importing&&Object.hasOwn(explorationUI.names,state.view))render();
+  }
+  function explore() {
+    if(state.busy||!state.result)return;
+    const form=$('explore-form');if(form&&!form.reportValidity())return;
+    try{const payload=explorationUI.request();
+      state.requestedExploreView=state.view;state.requestedRecapName=state.exploreSettings['recap-name'].trim();state.requestedRecapMode=state.exploreSettings['recap-mode'];state.busy=true;state.pending=++state.request;$('analyze-btn').disabled=true;$('app-status').textContent='';render();
+      worker().postMessage({id:state.pending,type:'explore',...payload});setProgress(0,'Analyzing your history…',false);
+    }catch(error){fail(error.message,false);}
   }
   function startImport(event) {
     event.preventDefault();if(state.busy||!state.files.length)return;
@@ -315,7 +330,7 @@
     if(state.busy||!state.result)return;
     if(!$('filter-form').reportValidity())return;
     if($('start-date').value>$('end-date').value){fail('Start date must be on or before end date.',false);return;}
-    state.busy=true;state.pending=++state.request;$('analyze-btn').disabled=true;$('app-status').textContent='';
+    state.requestedMinMs=Number($('min-seconds').value)*1000;state.busy=true;state.pending=++state.request;$('analyze-btn').disabled=true;$('app-status').textContent='';
     $('search-results').hidden=true;$('search-results').replaceChildren();
     worker().postMessage({id:state.pending,type:'analyze',options:{startDate:$('start-date').value,endDate:$('end-date').value,minMs:Number($('min-seconds').value)*1000,type:$('content-type').value,sessionGapMinutes:state.gap}});
     setProgress(0,'Analyzing your history…',false);
@@ -352,6 +367,7 @@
   }
   function discard(showLanding=true) {
     hideStats();
+    explorationUI.reset();
     clearTimeout(globalSearchTimer);
     state.worker?.terminate();state.worker=null;state.result=null;state.pending=++state.request;state.busy=false;state.files=[];state.detail=null;state.search='';state.view='overview';state.page=1;state.sessionPage=1;state.calendarYear=null;
     $('detail-dialog').close();$('widgets-dialog').close();$('detail-content').replaceChildren();$('search-results').replaceChildren();$('search-results').hidden=true;$('global-search').value='';content.replaceChildren();$('file-input').value='';$('file-list').replaceChildren();$('upload-status').textContent='';$('app-status').textContent='';$('range-summary').textContent='';$('filter-form').reset();$('period-year').replaceChildren();$('timezone-note').textContent='';$('timezone-caption').textContent='';$('upload-progress').hidden=true;$('job-progress').hidden=true;$('upload-btn').disabled=true;$('analyze-btn').disabled=false;
@@ -370,6 +386,7 @@
     if(!event.target.closest('[data-stats]'))hideStats();
     const target=event.target.closest('button,[data-go]');
     if(!target)return;
+    if(['export-csv','export-pdf','recap-pdf'].includes(target.id)){explorationUI.exportFile(target.id);return;}
     if(target.dataset.discard!==undefined){discard();return;}
     if(target.dataset.view){navigate(target.dataset.view);return;}
     if(target.dataset.go){navigate(target.dataset.go);return;}
@@ -384,7 +401,10 @@
     if(target.dataset.widgetMove){const index=state.widgets.findIndex(widget=>widget.id===target.dataset.widgetMove),other=index+Number(target.dataset.direction);[state.widgets[index],state.widgets[other]]=[state.widgets[other],state.widgets[index]];widgetSettings();render();return;}
     if(target.id==='apply-gap'){const input=$('session-gap');if(!input.reportValidity())return;state.gap=Number(input.value);analyze();}
   });
+  document.addEventListener('submit',event=>{if(event.target.id==='explore-form'){event.preventDefault();explore();}});
+  document.addEventListener('input',event=>explorationUI.capture(event.target));
   document.addEventListener('change',event=>{
+    if(explorationUI.change(event.target)){render();return;}
     if(event.target.dataset.widget){state.widgets.find(widget=>widget.id===event.target.dataset.widget).enabled=event.target.checked;render();}
     if(event.target.id==='calendar-year'){state.calendarYear=Number(event.target.value);render();}
     if(event.target.id==='library-sort'){state.sort=event.target.value;state.page=1;render();}

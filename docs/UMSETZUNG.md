@@ -1,6 +1,6 @@
 # VerdeStats: erste Ausbaustufe
 
-Umgesetzt am 8. Oktober 2026: die freigegebenen Punkte 1–45. Punkt 4 (Zeitzonenauswahl) und Punkt 9 (Import-Diagnosebericht) bleiben ausgeschlossen. Punkt 65 (Spotify-Anbindung) wird ebenfalls nicht eingebaut. Punkte ab 46 sind noch nicht Teil dieser Lieferung. In den anschließenden Oberflächenrunden wurden vergessene Favoriten, Comebacks, „Erstmals im Import“ und die Vergleichsspalte auf Wunsch entfernt.
+Umgesetzt am 8. Oktober 2026: die freigegebenen Punkte 1–45. Punkt 4 (Zeitzonenauswahl) und Punkt 9 (Import-Diagnosebericht) bleiben ausgeschlossen. Punkt 65 (Spotify-Anbindung) wird ebenfalls nicht eingebaut. Der Folgeausbau vom 09.10.2026 ergänzt die Punkte 46–58 sowie 61/62; siehe [Ausbau und Nachweise](AUSBAU-20261009.md). In den anschließenden Oberflächenrunden wurden vergessene Favoriten, Comebacks, „Erstmals im Import“ und die Vergleichsspalte auf Wunsch entfernt.
 
 ## Was du jetzt ausprobieren kannst
 
@@ -15,7 +15,7 @@ Umgesetzt am 8. Oktober 2026: die freigegebenen Punkte 1–45. Punkt 4 (Zeitzone
 
 ## Datenschutz bleibt Teil der Architektur
 
-Dateien und Ergebnisse bleiben lokal im Browser. Die Anwendung hat keine Upload-API, setzt keine Cookies und lädt keine externen Skripte, Schriften oder Bilder. Nur die ausdrücklich gewählte Sprache wird unter `verdestats-language` gespeichert. Der ausführliche [Datenschutzbericht](DATENSCHUTZ-PRUEFUNG.md) beschreibt die technische Prüfung und die getrennte spätere Prüfung deiner öffentlichen Serverkonfiguration.
+Dateien und Ergebnisse bleiben lokal im Browser. Die Anwendung hat keine Upload-API, setzt keine Cookies und lädt keine externen Skripte, Schriften oder Bilder. Nur die ausdrücklich gewählte Sprache und das Theme werden unter `verdestats-language` und `verdestats-theme` gespeichert. Der ausführliche [Datenschutzbericht](DATENSCHUTZ-PRUEFUNG.md) beschreibt die technische Prüfung und die getrennte spätere Prüfung deiner öffentlichen Serverkonfiguration.
 
 ## Nachweise
 

@@ -56,7 +56,7 @@ Import calculates the initial dashboard using the full available music period. F
 
 ## Privacy and storage
 
-Only the explicitly selected language is stored under `verdestats-language` in Local Storage. Spotify histories, results and dashboard settings are not written to Local Storage, Session Storage, IndexedDB or cookies. Widget choices last only for the current page. Original file fields such as historic IP addresses, usernames and user-agent values are discarded during normalization. Country, device, timing and content fields remain in local memory for the requested analyses.
+Only the explicitly selected language and theme are stored under `verdestats-language` and `verdestats-theme` in Local Storage. Spotify histories, results and dashboard settings are not written to Local Storage, Session Storage, IndexedDB or cookies. Widget choices last only for the current page. Original file fields such as historic IP addresses, usernames and user-agent values are discarded during normalization. Country, device, timing and content fields remain in local memory for the requested analyses.
 
 Clearing the data releases application references, clears displayed results and terminates the worker. Browser/OS memory reclamation is not a secure-erasure guarantee. The public server still processes connection metadata when delivering assets. See [the technical privacy review](docs/DATENSCHUTZ-PRUEFUNG.md); operator-specific legal notices are provided by the hosting website.
 
@@ -87,3 +87,27 @@ Tests use synthetic histories and the included example. They verify calculation 
 ## License
 
 MIT. Bundled fflate also uses the MIT license, provided alongside the deployed script.
+
+### Mobile navigation and themes
+
+Use Modern/Legacy next to EN/DE on the landing page or in the dashboard. Legacy extends the original black/neon-green design across all views and dialogs; Modern remains the default. On phones and tablets, Menu opens all eleven sections and Filters expands the analysis controls. Both preferences survive reloads; imported histories remain in memory only.
+
+### Optional browser acceptance checks
+
+The browser checks use synthetic histories. Install Playwright and Axe locally
+(without modifying the lockfile), then install Chromium:
+
+```sh
+npm install --no-save --package-lock=false playwright @axe-core/playwright
+npx playwright install chromium
+node tests/mobile-theme.acceptance.cjs
+node tests/explorations.acceptance.cjs
+```
+
+Without `TEST_BASE`, each check builds and starts its own local preview.
+`TEST_BASE` selects your own test deployment; `ARTIFACTS` selects an output folder
+(default: ignored `tests/artifacts/`). `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` can
+select an existing Chromium installation.
+
+Operator-specific legal links, hosting configuration, private backups and
+production test artifacts are kept locally and excluded from this release.

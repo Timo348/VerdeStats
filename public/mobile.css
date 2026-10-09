@@ -1,0 +1,128 @@
+/* Shared improvements also keep zoomed desktop layouts usable. */
+.mobile-menu-button { display:none; }
+.filter-disclosure>summary { display:none; }
+.navigation-dialog { background:var(--panel); color:var(--text); border:1px solid var(--border-strong); border-radius:12px; width:min(480px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:20px; overflow:auto; overscroll-behavior:contain; }
+body.navigation-open { overflow:hidden; }
+.sidebar { height:100dvh; overflow-y:auto; }
+.sidebar-label { margin-top:28px; }
+.sidebar-bottom { padding-top:16px; }
+.sidebar-bottom .appearance-controls { gap:8px; }
+.sidebar-bottom .theme-switch { width:100%; }
+.sidebar-bottom .theme-switch button { flex:1; }
+.language-hint { font-size:11px; max-width:none; }
+.stat-label,.stat-value,.stat-note,.record-name,.rank-main small { overflow-wrap:anywhere; }
+.content-grid .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.section-heading>div,.rank-main,.search-result>span:first-child { min-width:0; }
+.section-heading { flex-wrap:wrap; }
+.search-result strong,.search-result small { overflow-wrap:anywhere; }
+.dashboard-footer,.site-footer { flex-wrap:wrap; font-size:12px; }
+.dashboard-footer a,.site-footer a { display:inline-flex; align-items:center; min-height:44px; }
+.table-scroll,.chart-scroll,.calendar-scroll,.heatmap-scroll,.explore-table-wrap { overscroll-behavior-x:contain; scrollbar-width:thin; }
+@media(max-width:800px) {
+  .sidebar { position:sticky; z-index:20; top:0; height:auto; overflow:visible; padding:12px 16px; grid-template-columns:minmax(0,1fr) auto; gap:10px; background:var(--sidebar); }
+  .sidebar .brand { padding:0; align-self:center; }
+  .mobile-menu-button { display:inline-flex; grid-row:1; grid-column:2; min-height:44px; font-size:13px; }
+  #desktop-navigation-slot { display:none; }
+  .sidebar-bottom { grid-column:1/-1; grid-row:2; padding:0; }
+  .sidebar-bottom .appearance-controls { justify-content:space-between; flex-wrap:nowrap; gap:10px; }
+  .sidebar-bottom .theme-switch { width:auto; }
+  .sidebar-bottom .language-hint { display:none; }
+  .theme-switch button,.language-switch button { min-height:44px; min-width:44px; }
+  .navigation-dialog .app-nav { margin:0 0 16px; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; overflow:visible; }
+  .navigation-dialog .app-nav button { white-space:normal; min-height:48px; padding:12px; font-size:14px; gap:8px; }
+  .navigation-dialog .nav-icon { display:inline-block; flex-shrink:0; }
+  .navigation-dialog .nav-divider { display:none; }
+  .navigation-dialog .dialog-top { margin-bottom:16px; }
+  .icon-button,.widget-setting .icon-button { width:44px; height:44px; flex-shrink:0; }
+  .filter-disclosure { border:1px solid var(--border); border-radius:10px; background:var(--panel); }
+  .filter-disclosure>summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; min-height:48px; font-size:14px; font-weight:600; cursor:pointer; list-style:none; }
+  .filter-disclosure>summary::-webkit-details-marker { display:none; }
+  .filter-chevron { font-size:20px; line-height:1; }
+  .filter-disclosure[open] .filter-chevron { transform:rotate(180deg); }
+  .filter-bar { border:0; border-top:1px solid var(--border); border-radius:0 0 10px 10px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; padding:16px; }
+  .filter-bar label,.filter-bar label:first-child,.filter-bar label#year-field,.filter-bar label#month-field { min-width:0; }
+  .filter-bar label:first-child select { min-width:0; }
+  .filter-bar .button { grid-column:1/-1; width:100%; margin:0; }
+  .filter-bar label>span { font-size:12px; }
+  input,select,.filter-bar input,.filter-bar select,.global-search input,.explore-form input,.explore-form select { font-size:16px; min-height:44px; }
+  input[type=checkbox] { min-height:20px; width:20px; }
+  input[type=date],input[type=month] { width:100%; min-width:0; min-inline-size:0; }
+  .button { min-height:44px; font-size:13px; white-space:normal; text-align:center; }
+  .text-button { min-height:44px; font-size:13px; }
+  .range-caption { font-size:12px; overflow-wrap:anywhere; margin:12px 2px 20px; }
+  .app-header { gap:16px; }
+  .eyebrow { font-size:10px; }
+  .segmented button { min-height:44px; min-width:44px; font-size:12px; }
+  .pagination { flex-wrap:wrap; font-size:12px; }
+  .pagination .button { min-height:44px; min-width:44px; font-size:12px; padding:8px 12px; }
+  .session-setting { flex-wrap:wrap; font-size:13px; }
+  .session-setting input { width:80px; font-size:16px; min-height:44px; }
+  .session-setting .button { min-height:44px; }
+  .widget-setting label { min-height:44px; }
+  .detail-dialog,.settings-dialog { max-height:calc(100dvh - 24px); }
+  .stat-label,.stat-note,.panel-note,.key-value small,.rank-number,.rank-value,.rank-main small,.data-table th,.entity-button small { font-size:12px; }
+  .rank-main strong,.entity-button strong { font-size:14px; }
+  .rank-main strong,.rank-main small { white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+  .rank-item { gap:10px; grid-template-columns:22px minmax(0,1fr) auto; min-height:56px; }
+  .data-table { font-size:14px; }
+  .data-table td.number { font-size:12px; }
+  .entity-button { min-height:44px; }
+  .chart-column { min-width:38px; }
+  .chart-column span:last-child,.chart-meta { font-size:12px; }
+  .bar-label,.bar-value { font-size:12px; }
+  .bar-row { grid-template-columns:minmax(65px,110px) minmax(0,1fr) 76px; gap:8px; }
+  .key-value strong,.milestone strong,.milestone small { font-size:13px; }
+  .dashboard-footer { gap:8px 16px; padding-bottom:max(20px,env(safe-area-inset-bottom)); }
+}
+@media(max-width:620px) {
+  body { font-size:14px; }
+  .landing-header { flex-wrap:wrap; gap:12px; padding:16px; }
+  .landing-header>.appearance-controls { width:100%; justify-content:space-between; margin:0; }
+  .landing-main { padding:0 16px; margin:30px auto; }
+  .landing-intro h1 { font-size:clamp(28px,8vw,36px); }
+  .upload-panel,.panel { padding:16px; }
+  .drop-zone { min-height:180px; padding:20px 12px; }
+  .drop-zone strong { font-size:14px; }
+  .drop-zone>span,.privacy-note,.file-row,.format-note code { font-size:12px; }
+  .tutorial summary { min-height:44px; align-items:center; gap:12px; font-size:14px; }
+  .app-main { padding:20px 14px 0; }
+  .app-header { flex-direction:column; align-items:stretch; }
+  .app-header h1 { font-size:28px; }
+  .global-search { width:100%; max-width:none; padding:0 12px; margin:0; }
+  .global-search input { font-size:16px; min-height:44px; }
+  .global-search svg { width:19px; flex-shrink:0; }
+  .search-results { width:100%; max-height:min(440px,60dvh); top:50px; }
+  .search-result { padding:12px 6px; min-height:48px; }
+  .search-result strong { font-size:14px; }
+  .search-result small,.search-result>span:last-child { font-size:12px; }
+  .stats-grid { gap:12px; }
+  .stat-card { padding:16px 12px; }
+  .stat-value { font-size:clamp(21px,6.5vw,28px); }
+  .view-intro { flex-wrap:wrap; align-items:center; gap:10px; }
+  .view-intro p { font-size:13px; }
+  .view-intro .button { font-size:13px; min-height:44px; }
+  .library-controls input,.library-controls select { font-size:16px; min-height:44px; }
+  .library-selects { flex-wrap:wrap; }
+  .ranking-filter-label { width:100%; font-size:12px; }
+  .library-selects select { width:100%; flex:1 1 100%; }
+  .key-values { gap:16px; }
+  .data-summary .key-values { grid-template-columns:1fr; }
+  .detail-dialog,.settings-dialog { padding:16px; }
+  .dialog-top { gap:12px; }
+  .detail-links .button { min-height:44px; font-size:13px; }
+  .widget-setting { gap:8px; font-size:13px; }
+  .widget-setting label { min-width:0; }
+  .widget-setting>div { flex-shrink:0; }
+  .explore-form fieldset { width:100%; padding:12px; }
+  .explore-form fieldset label { width:100%; }
+  .site-footer { font-size:12px; padding:16px 16px max(16px,env(safe-area-inset-bottom)); }
+}
+@media(pointer:coarse) {
+  .calendar-wrap { min-width:1120px; }
+  .calendar-labels { grid-template-rows:repeat(7,18px); font-size:11px; }
+  .calendar-grid { grid-template-rows:repeat(7,18px); grid-auto-columns:minmax(16px,1fr); }
+  .calendar-day,.calendar-pad { height:18px; }
+  .heatmap { min-width:1040px; grid-template-columns:46px repeat(24,minmax(36px,1fr)); }
+  .heatmap-cell { height:36px; }
+  .chart-column { min-width:44px; }
+}

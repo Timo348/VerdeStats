@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 .env
 uploads/*
 !uploads/.gitkeep
@@ -7,3 +7,15 @@ npm-debug.log*
 .DS_Store
 
 dist/
+
+# Operator-specific deployment, generated output and private test artifacts
+/local/
+/static/
+/DEPLOYMENT.md
+/tests/artifacts/
+/tests/browser.cjs
+/tests/deployment-v2.cjs
+/tests/geoip.py
+/tests/mobile-theme.smoke.cjs
+.env.*
+!.env.example

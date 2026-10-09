@@ -1,10 +1,14 @@
+## Technische Ergänzung vom 09.10.2026
+
+Der Modern/Legacy-Schalter speichert nach ausdrücklicher Auswahl ausschließlich `modern` oder `legacy` unter `verdestats-theme`. Standard ohne gespeicherte Auswahl: Modern. `verdestats-language` bleibt der einzige weitere persistente Clientwert. Hördaten, Ergebnisse, Filter und Dashboard-Anordnung bleiben im Arbeitsspeicher. Die zugehörigen Speicherhinweise in der Oberfläche und in der technischen Dokumentation wurden ergänzt. Die nachfolgende Prüfung beschreibt ihren historischen Stand vom 8. Oktober.
+
 # Datenschutzprüfung: VerdeStats als Browser-Anwendung
 
 Stand: **8. Oktober 2026**. Umfang: freigegebene Funktionen 1–45, ohne Zeitzonen-Auswahl und Importbericht. Impressum und Datenschutzerklärung ergänzt der Betreiber serverseitig. Spotify-API, Cover, öffentliche Ergebnislinks, Konten, dauerhafte Archive und Exporte gehören nicht zu dieser Ausbaustufe.
 
 **Ergebnis:** Die vorhandene Browser-Architektur wird erhalten. Nutzer wählen Dateien auf ihrem Gerät; ein lokaler Web Worker verarbeitet JSON beziehungsweise ZIP und liefert Ergebnisse an die Oberfläche im selben Browser. Neue Diagramme und persönliche Entdeckungen benötigen keine Übertragung der Hördateien. Das frühere Server-Upload-Konzept aus GitHub-main ist nicht die Grundlage dieser Prüfung.
 
-**Prüfstatus:** Die bisherige [Live-Anwendung](https://verdestats.timolab.de/) wurde anhand ihrer ausgelieferten Skripte und HTTP-Antwort geprüft. Die erweiterte lokale Fassung wurde gebaut und nach Entfernung der vergessenen Favoriten mit **34 bestandenen Tests** geprüft. Ihre statische Nginx-Auslieferung weist Upload-Versuche mit HTTP 405 zurück, setzt keine Sitzungscookies und liefert eine Content-Security-Policy mit `connect-src 'none'`. Quellcode und unabhängige Prüfung bestätigen die nachfolgend beschriebenen lokalen Datenflüsse. Hosting-Konfiguration, Logs, vorgeschaltete Dienste und GeoIP-Verarbeitung der öffentlichen Produktionsumgebung bleiben ungeprüft; der Betreiber prüft sie später. Dieses Dokument bestätigt keine abgeschlossene rechtliche Zertifizierung.
+**Prüfstatus:** Die bisherige Anwendung wurde anhand ihrer ausgelieferten Skripte und HTTP-Antwort geprüft. Die erweiterte lokale Fassung wurde gebaut und nach Entfernung der vergessenen Favoriten mit **34 bestandenen Tests** geprüft. Ihre statische Nginx-Auslieferung weist Upload-Versuche mit HTTP 405 zurück, setzt keine Sitzungscookies und liefert eine Content-Security-Policy mit `connect-src 'none'`. Quellcode und unabhängige Prüfung bestätigen die nachfolgend beschriebenen lokalen Datenflüsse. Hosting-Konfiguration, Logs, vorgeschaltete Dienste und GeoIP-Verarbeitung der öffentlichen Produktionsumgebung bleiben ungeprüft; der Betreiber prüft sie später. Dieses Dokument bestätigt keine abgeschlossene rechtliche Zertifizierung.
 
 ## Live-Befund und geprüfte lokale Erweiterung
 

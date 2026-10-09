@@ -1,6 +1,6 @@
 /* Listening files and normalized streams remain inside this worker's RAM. */
 'use strict';
-importScripts('/vendor/fflate.js', '/analyzer.js');
+importScripts('/vendor/fflate.js', '/analyzer.js', '/explorations.js');
 
 const LIMITS = Object.freeze({ fileBytes: 512 * 1024 * 1024, totalBytes: 2 * 1024 * 1024 * 1024, expandedBytes: 2 * 1024 * 1024 * 1024, files: 200, archiveEntries: 10000, streams: 2000000 });
 let history = [];
@@ -162,6 +162,11 @@ self.onmessage = async function (event) {
       const result = VerdeAnalyzer.analyzeEntries(history, message.options || {}, historyFileCount);
       progress(id, 100, 'complete');
       respond(id, 'result', { result });
+    } else if (message.type === 'explore') {
+      progress(id, 10, 'analyzing');
+      const result = VerdeExplorations.explore(history, message.options || {}, message.request || {});
+      progress(id, 100, 'complete');
+      respond(id, 'exploration', { result });
     } else throw new Error('Unknown analysis request');
   } catch (error) {
     if (message.type === 'import') { history = []; historyFileCount = 0; }
